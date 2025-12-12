@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN" data-theme="dark">
+<html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -640,8 +640,14 @@
         });
     }
 
-    // Initialize language on page load
+    // Initialize language and theme on page load
     document.addEventListener('DOMContentLoaded', () => {
+        // Theme initialization
+        const savedTheme = localStorage.getItem('theme') || 'dark';
+        html.setAttribute('data-theme', savedTheme);
+        themeBtn.querySelector('i').className = savedTheme === 'dark' ? 'ri-moon-line' : 'ri-sun-line';
+
+        // Language initialization
         let userLang = localStorage.getItem('lang') || navigator.language.split('-')[0];
         if (!resources[userLang]) {
             userLang = 'en'; // Default to English if user's language is not supported
@@ -659,7 +665,7 @@
         nav.classList.toggle('scrolled', window.scrollY > 20);
     });
 
-    // 2. Theme Toggle with Animation
+    // 2. Theme Toggle with Animation & Persistence
     themeBtn.addEventListener('click', () => {
         const icon = themeBtn.querySelector('i');
         // Icon spin animation
@@ -669,6 +675,7 @@
         setTimeout(() => {
             const current = html.getAttribute('data-theme');
             const next = current === 'dark' ? 'light' : 'dark';
+            localStorage.setItem('theme', next); // Save preference
             html.setAttribute('data-theme', next);
 
             icon.className = next === 'dark' ? 'ri-moon-line' : 'ri-sun-line';
