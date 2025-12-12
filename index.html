@@ -127,7 +127,7 @@
         }
         .brand img { width: 32px; height: 32px; border-radius: 6px; }
 
-        .nav-tools { display: flex; gap: 12px; }
+        .nav-tools { display: flex; align-items: center; gap: 12px; }
         .tool-btn {
             background: transparent; border: 1px solid var(--border-color);
             color: var(--text-main); width: 42px; height: 42px; border-radius: 50%;
@@ -135,6 +135,133 @@
             transition: 0.3s cubic-bezier(0.3, 2, 0.3, 1);
         }
         .tool-btn:hover { background: var(--text-main); color: var(--bg-body); transform: scale(1.1); border-color: transparent; }
+
+        /* Custom Language Selector */
+        .custom-select-wrapper {
+            position: relative;
+            user-select: none;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        .custom-select-trigger {
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            height: 42px;
+            padding: 0 40px 0 20px;
+            border: 1px solid var(--border-color);
+            border-radius: 100px;
+            background-color: var(--bg-card);
+            backdrop-filter: blur(10px);
+            color: var(--text-main);
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s var(--ease-smooth);
+        }
+
+        .custom-select-trigger:hover {
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .custom-select-trigger .custom-select-label {
+            white-space: nowrap;
+        }
+
+        .custom-select-trigger::after {
+            content: '';
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 16px;
+            height: 16px;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='rgba(255,255,255,0.7)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: center;
+            background-size: 16px;
+            transition: transform 0.3s var(--ease-smooth);
+        }
+
+        [data-theme="light"] .custom-select-trigger {
+            color: var(--text-main);
+        }
+        [data-theme="light"] .custom-select-trigger::after {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='rgba(0,0,0,0.6)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+        }
+
+        .custom-options {
+            position: absolute;
+            top: calc(100% + 8px);
+            left: 0;
+            right: 0;
+            min-width: 160px;
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            background-color: var(--bg-card);
+            backdrop-filter: blur(16px) saturate(180%);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+            padding: 8px;
+            z-index: 200;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(10px) scale(0.98);
+            transition: all 0.3s var(--ease-smooth);
+        }
+
+        .custom-select-wrapper.open .custom-options {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0) scale(1);
+        }
+
+        .custom-select-wrapper.open .custom-select-trigger::after {
+            transform: translateY(-50%) rotate(180deg);
+        }
+
+        .custom-option {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            border-radius: 8px;
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.2s var(--ease-smooth);
+        }
+        
+        .custom-option + .custom-option {
+            margin-top: 4px;
+        }
+
+        .custom-option:hover {
+            background-color: var(--glass-shine);
+            color: var(--text-main);
+        }
+
+        .custom-option.selected {
+            color: var(--primary);
+            font-weight: 600;
+            background-color: var(--glass-shine);
+        }
+
+        .custom-option i {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            transition: color 0.2s var(--ease-smooth);
+        }
+
+        .custom-option:hover i,
+        .custom-option.selected i {
+            color: var(--primary);
+        }
+
+        .lang-select {
+            display: none; /* Hide original select */
+        }
+
 
         /* --- 4. Hero 区域 --- */
         .hero {
@@ -215,10 +342,10 @@
 
         /* 核心 Logo */
         .main-logo {
-            width: 100%; /* Increased size */
-            height: 100%; /* Increased size */
+            width: 120%; /* Increased size */
+            height: 120%; /* Increased size */
             object-fit: contain;
-            position: absolute; top: 5%; left: 5%; /* Adjust position due to increased size */
+            position: absolute; top: 5%; left: -10%; /* Adjust position due to increased size */
             filter: var(--logo-glow);
             transform: translateZ(50px);
             z-index: 10;
@@ -363,7 +490,20 @@
         ShardLauncher
     </a>
     <div class="nav-tools">
-        <button class="tool-btn" id="lang-btn" aria-label="Language"><i class="ri-translate"></i></button>
+        <div class="custom-select-wrapper">
+            <select id="lang-select" class="lang-select" aria-label="Select Language">
+                <option value="zh">简体中文</option>
+                <option value="en">English</option>
+            </select>
+            <div class="custom-select-trigger">
+                <i class="ri-global-line"></i>
+                <span class="custom-select-label"></span>
+            </div>
+            <div class="custom-options">
+                <div class="custom-option" data-value="zh"><i class="ri-earth-fill"></i><span>简体中文</span></div>
+                <div class="custom-option" data-value="en"><i class="ri-earth-fill"></i><span>English</span></div>
+            </div>
+        </div>
         <button class="tool-btn" id="theme-btn" aria-label="Theme"><i class="ri-moon-line"></i></button>
     </div>
 </nav>
@@ -395,7 +535,7 @@
             <!-- 呼吸光效层 (位于图片后方) -->
             <div class="breathing-glow"></div>
             <!-- 主图片：这里已改回 logo.png -->
-            <img src="logo.png" alt="Shard" class="main-logo" onerror="this.src='https://avatars.githubusercontent'">
+            <img src="logo.png" alt="Shard" class="main-logo" onerror="this.src='https://avatars.githubusercontent.com'">
         </div>
     </div>
 </header>
@@ -487,9 +627,32 @@
     };
 
     const themeBtn = document.getElementById('theme-btn');
-    const langBtn = document.getElementById('lang-btn');
+    const langSelect = document.getElementById('lang-select');
     const html = document.documentElement;
     const nav = document.getElementById('navbar');
+
+    // Function to apply translations
+    function applyTranslations(lang) {
+        const data = resources[lang];
+        document.querySelectorAll('[data-i18n]').forEach(el => {
+            const key = el.getAttribute('data-i18n');
+            if (data[key]) el.innerHTML = data[key];
+        });
+    }
+
+    // Initialize language on page load
+    document.addEventListener('DOMContentLoaded', () => {
+        let userLang = localStorage.getItem('lang') || navigator.language.split('-')[0];
+        if (!resources[userLang]) {
+            userLang = 'en'; // Default to English if user's language is not supported
+        }
+        html.setAttribute('lang', userLang);
+        langSelect.value = userLang;
+        applyTranslations(userLang);
+        
+        // Initialize custom select
+        initializeCustomSelect(userLang);
+    });
 
     // 1. Navbar Scroll Effect
     window.addEventListener('scroll', () => {
@@ -514,29 +677,53 @@
         }, 200);
     });
 
-    // 3. Language Toggle with Fade
-    let curLang = 'en';
-    langBtn.addEventListener('click', () => {
-        curLang = curLang === 'en' ? 'zh' : 'en';
-        const data = resources[curLang];
-
-        document.querySelectorAll('[data-i18n]').forEach(el => {
-            el.style.opacity = '0';
-            el.style.transform = 'translateY(10px)';
-            el.style.transition = '0.3s';
-        });
-
-        setTimeout(() => {
-            document.querySelectorAll('[data-i18n]').forEach(el => {
-                const key = el.getAttribute('data-i18n');
-                if (data[key]) el.innerHTML = data[key];
-                el.style.opacity = '1';
-                el.style.transform = 'translateY(0)';
-            });
-        }, 300);
+    // 3. Language Change Logic
+    langSelect.addEventListener('change', (event) => {
+        const selectedLang = event.target.value;
+        localStorage.setItem('lang', selectedLang); // Save preference
+        location.reload(); // Reload page to apply new language
     });
 
-    // 4. Smooth 3D Tilt Effect
+    // 4. Custom Select Logic
+    function initializeCustomSelect(currentLang) {
+        const wrapper = document.querySelector('.custom-select-wrapper');
+        const trigger = wrapper.querySelector('.custom-select-trigger');
+        const triggerLabel = trigger.querySelector('.custom-select-label');
+        const options = wrapper.querySelectorAll('.custom-option');
+        const customOptions = wrapper.querySelector('.custom-options');
+
+        // Set initial display
+        const initialOption = customOptions.querySelector(`.custom-option[data-value="${currentLang}"]`);
+        if (initialOption) {
+            triggerLabel.textContent = initialOption.querySelector('span').textContent;
+            options.forEach(opt => opt.classList.remove('selected'));
+            initialOption.classList.add('selected');
+        }
+
+        trigger.addEventListener('click', (e) => {
+            e.stopPropagation();
+            wrapper.classList.toggle('open');
+        });
+
+        options.forEach(option => {
+            option.addEventListener('click', () => {
+                const selectedValue = option.getAttribute('data-value');
+                if (selectedValue !== langSelect.value) {
+                    langSelect.value = selectedValue;
+                    langSelect.dispatchEvent(new Event('change'));
+                }
+                wrapper.classList.remove('open');
+            });
+        });
+
+        window.addEventListener('click', () => {
+            if (wrapper.classList.contains('open')) {
+                wrapper.classList.remove('open');
+            }
+        });
+    }
+
+    // 5. Smooth 3D Tilt Effect
     const card = document.getElementById('tilt-card');
     let bounds;
 
