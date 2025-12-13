@@ -506,6 +506,96 @@
             .f-col { align-items: center; display: flex; flex-direction: column; }
             .ring { display: none; } /* 移动端优化性能 */
         }
+        /* --- 9. 项目统计 (Project Stats) --- */
+        .stats-section {
+            padding: 40px 6% 120px;
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        /* 统计区块的容器，稍微紧凑一些 */
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 20px;
+            padding: 40px;
+            background: rgba(var(--bg-surface), 0.3);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            backdrop-filter: blur(10px);
+            position: relative;
+        }
+
+        /* 顶部装饰线 */
+        .stats-container::before {
+            content: ''; position: absolute; top: 0; left: 20%; right: 20%; height: 1px;
+            background: linear-gradient(90deg, transparent, var(--primary), transparent);
+            opacity: 0.5;
+        }
+
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 10px;
+            position: relative;
+        }
+
+        /* 分割线 */
+        .stat-item:not(:last-child)::after {
+            content: ''; position: absolute; right: -10px; top: 20%; height: 60%; width: 1px;
+            background: var(--border-color);
+        }
+
+        .stat-icon {
+            font-size: 1.5rem;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+            transition: 0.3s;
+        }
+
+        .stat-number {
+            font-family: 'Space Grotesk', monospace;
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 4px;
+            line-height: 1.1;
+            /* 数字渐变 */
+            background: linear-gradient(180deg, var(--text-main) 0%, rgba(255,255,255,0.7) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        [data-theme="light"] .stat-number {
+            background: linear-gradient(180deg, var(--text-main) 0%, rgba(0,0,0,0.6) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            font-weight: 600;
+        }
+
+        .stat-item:hover .stat-icon { color: var(--primary); transform: scale(1.1); text-shadow: 0 0 10px var(--primary); }
+
+        /* 响应式调整 - 添加到现有的 @media (max-width: 1024px) 内部 */
+        @media (max-width: 1024px) {
+            .stats-container { grid-template-columns: repeat(3, 1fr); gap: 30px; }
+            .stat-item:not(:last-child)::after { display: none; } /* 移动端移除分割线 */
+        }
+
+        @media (max-width: 767px) {
+            .stats-container { grid-template-columns: repeat(2, 1fr); padding: 24px; }
+            /* 让最后一个元素独占一行居中 */
+            .stat-item:last-child { grid-column: span 2; }
+            .stat-number { font-size: 1.8rem; }
+        }
 
         /* 针对手机竖屏的进一步优化 */
         @media (max-width: 767px) {
@@ -598,15 +688,50 @@
             Seamless performance, glassmorphic design, and absolute control.
         </p>
         <div class="btn-group stagger-animate delay-3">
-            <a href="https://github.com/LanRhyme/ShardLauncher/releases" class="btn btn-pri">
+            <a href="https://github.com/ShardLauncher/ShardLauncher/releases" class="btn btn-pri">
                 <i class="ri-download-cloud-2-fill"></i> <span data-i18n="btn.download">Download APK</span>
             </a>
-            <a href="https://github.com/LanRhyme/ShardLauncher" class="btn btn-sec">
+            <a href="https://github.com/ShardLauncher/ShardLauncher" class="btn btn-sec">
                 <i class="ri-github-fill"></i> Source
             </a>
         </div>
     </div>
 </header>
+
+<section class="stats-section">
+    <div class="stats-container stagger-animate delay-3">
+        <!-- Stars -->
+        <div class="stat-item">
+            <i class="ri-star-smile-line stat-icon"></i>
+            <div class="stat-number" id="stat-stars">--</div>
+            <div class="stat-label" data-i18n="stat.stars">Stars</div>
+        </div>
+        <!-- Commits -->
+        <div class="stat-item">
+            <i class="ri-git-commit-line stat-icon"></i>
+            <div class="stat-number" id="stat-commits">--</div>
+            <div class="stat-label" data-i18n="stat.commits">Commits</div>
+        </div>
+        <!-- Pull Requests -->
+        <div class="stat-item">
+            <i class="ri-git-pull-request-line stat-icon"></i>
+            <div class="stat-number" id="stat-prs">--</div>
+            <div class="stat-label" data-i18n="stat.prs">PRs</div>
+        </div>
+        <!-- Issues -->
+        <div class="stat-item">
+            <i class="ri-bug-line stat-icon"></i>
+            <div class="stat-number" id="stat-issues">--</div>
+            <div class="stat-label" data-i18n="stat.issues">Issues</div>
+        </div>
+        <!-- Contributors -->
+        <div class="stat-item">
+            <i class="ri-user-heart-line stat-icon"></i>
+            <div class="stat-number" id="stat-contributors">--</div>
+            <div class="stat-label" data-i18n="stat.contributors">Contribs</div>
+        </div>
+    </div>
+</section>
 
 <section class="features">
     <div class="grid-container">
@@ -677,7 +802,12 @@
             "ft.3.t": "沉浸音频",
             "ft.3.d": "内置高保真音频引擎，即使在游戏加载时也能享受无缝音乐体验。",
             "ft.4.t": "微粒级控制",
-            "ft.4.d": "从内存分配到自定义运行时参数，ShardLauncher 将引擎的钥匙交给你。"
+            "ft.4.d": "从内存分配到自定义运行时参数，ShardLauncher 将引擎的钥匙交给你。",
+            "stat.stars": "标星",
+            "stat.commits": "提交",
+            "stat.prs": "合并请求",
+            "stat.issues": "问题反馈",
+            "stat.contributors": "贡献者"
         },
         en: {
             "hero.title": "Minecraft, <br><span class=\"highlight\">Redefined.</span>",
@@ -690,7 +820,12 @@
             "ft.3.t": "Immersive Audio",
             "ft.3.d": "Built-in high-fidelity audio engine that keeps playing even when the game is loading.",
             "ft.4.t": "Granular Control",
-            "ft.4.d": "From memory allocation to custom runtime arguments, ShardLauncher gives you the keys to the engine."
+            "ft.4.d": "From memory allocation to custom runtime arguments, ShardLauncher gives you the keys to the engine.",
+            "stat.stars": "Stars",
+            "stat.commits": "Commits",
+            "stat.prs": "PRs",
+            "stat.issues": "Issues",
+            "stat.contributors": "Contribs"
         }
     };
 
@@ -838,6 +973,92 @@
             card.style.transform = '';
         });
     }
+
+    // --- 6. GitHub Statistics Fetcher & Animator ---
+
+    // 数字滚动动画函数
+    function animateValue(obj, start, end, duration) {
+        let startTimestamp = null;
+        const step = (timestamp) => {
+            if (!startTimestamp) startTimestamp = timestamp;
+            const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+            // 使用 easeOutQuart 缓动算法让动画更自然
+            const easeProgress = 1 - Math.pow(1 - progress, 4);
+            obj.innerHTML = Math.floor(progress * (end - start) + start);
+            if (progress < 1) {
+                window.requestAnimationFrame(step);
+            } else {
+                obj.innerHTML = end; // 确保最终数字准确
+            }
+        };
+        window.requestAnimationFrame(step);
+    }
+
+    // 格式化数字 (例如 1200 -> 1.2k) - 可选，这里我为了精确性暂时直接显示数字
+    // 如果数字很大，可以使用这个函数
+    function formatNumber(num) {
+        return num > 1000 ? (num/1000).toFixed(1) + 'k' : num;
+    }
+
+    async function fetchGitHubStats() {
+        const repo = 'ShardLauncher/ShardLauncher';
+
+        try {
+            // 1. 获取基础信息 (Stars, Issues)
+            const repoRes = await fetch(`https://api.github.com/repos/${repo}`);
+            if(!repoRes.ok) throw new Error('API Rate Limit');
+            const repoData = await repoRes.json();
+
+            animateValue(document.getElementById('stat-stars'), 0, repoData.stargazers_count, 2000);
+            animateValue(document.getElementById('stat-issues'), 0, repoData.open_issues_count, 2000);
+
+            // 2. 获取 PR 总数 (使用 Search API)
+            // 注意：Search API 限制较严，如果失败则显示 "-"
+            const prRes = await fetch(`https://api.github.com/search/issues?q=repo:${repo}+type:pr`);
+            const prData = await prRes.json();
+            if (prData.total_count) {
+                animateValue(document.getElementById('stat-prs'), 0, prData.total_count, 2000);
+            }
+
+            // 3. 获取 Commits 和 Contributors
+            // 直接获取总量通常需要遍历分页，这里使用一个小技巧：
+            // 请求 per_page=1，然后解析 Link Header 中的 last page number
+
+            // 获取 Contributors 总数
+            const contribRes = await fetch(`https://api.github.com/repos/${repo}/contributors?per_page=1&anon=true`);
+            const contribLink = contribRes.headers.get('link');
+            if (contribLink) {
+                // 正则提取 last page 的页码
+                const match = contribLink.match(/&page=(\d+)>; rel="last"/);
+                if (match) {
+                    animateValue(document.getElementById('stat-contributors'), 0, parseInt(match[1]), 2000);
+                }
+            } else {
+                // 如果没有分页，说明少于1页，直接获取数组长度
+                const contribData = await contribRes.json();
+                animateValue(document.getElementById('stat-contributors'), 0, contribData.length, 2000);
+            }
+
+            // 获取 Commits 总数
+            const commitRes = await fetch(`https://api.github.com/repos/${repo}/commits?per_page=1`);
+            const commitLink = commitRes.headers.get('link');
+            if (commitLink) {
+                const match = commitLink.match(/&page=(\d+)>; rel="last"/);
+                if (match) {
+                    animateValue(document.getElementById('stat-commits'), 0, parseInt(match[1]), 2500);
+                }
+            }
+
+        } catch (error) {
+            console.warn('GitHub Stats Fetch Failed (likely rate limit):', error);
+            // 失败时保持显示 "--" 或设置默认值
+        }
+    }
+
+    // 在页面加载完成后稍作延迟执行，避免阻塞首屏渲染
+    window.addEventListener('load', () => {
+        setTimeout(fetchGitHubStats, 500);
+    });
 
 </script>
 </body>
