@@ -216,11 +216,12 @@
         /* --- 下载卡片区域 --- */
         .download-wrapper {
             flex: 1; display: flex; align-items: center; justify-content: center;
+            flex-wrap: wrap; gap: 30px;
             padding: 40px 20px; position: relative; z-index: 10;
         }
 
         .download-card {
-            width: 100%; max-width: 500px;
+            width: 100%; max-width: 480px;
             background: var(--bg-card);
             border: 1px solid var(--border-color);
             border-radius: 24px;
@@ -228,6 +229,11 @@
             backdrop-filter: blur(20px);
             box-shadow: 0 20px 40px -10px rgba(0,0,0,0.1);
             animation: cardUp 0.8s var(--ease-smooth);
+            display: flex; flex-direction: column;
+        }
+        .download-card.release-card {
+            border-color: rgba(16, 185, 129, 0.3);
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.05), var(--bg-card));
         }
         @keyframes cardUp { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
 
@@ -237,16 +243,21 @@
             display: inline-flex; align-items: center; gap: 6px;
             padding: 4px 12px; border-radius: 100px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;
             background: rgba(255, 50, 50, 0.1); color: #ff4d4d; border: 1px solid rgba(255, 50, 50, 0.2);
+            margin-bottom: 12px;
+        }
+        .release-card .card-badge {
+            background: rgba(16, 185, 129, 0.1); color: #10b981; border-color: rgba(16, 185, 129, 0.2);
         }
 
         .build-info {
             background: rgba(0,0,0,0.2); border-radius: 12px; padding: 16px; margin-bottom: 30px;
             border: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 8px;
+            flex-grow: 1;
         }
         [data-theme="light"] .build-info { background: rgba(255,255,255,0.4); }
         .info-row { display: flex; justify-content: space-between; font-size: 0.9rem; color: var(--text-muted); }
-        .info-row span:last-child { color: var(--text-main); font-family: monospace; }
-        .commit-msg { font-size: 0.85rem; color: var(--text-muted); font-style: italic; margin-top: 4px; display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; }
+        .info-row span:last-child { color: var(--text-main); font-family: monospace; text-align: right; }
+        .commit-msg { font-size: 0.85rem; color: var(--text-muted); font-style: italic; margin-top: 4px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 
         .control-group { margin-bottom: 20px; }
         .label { display: block; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 8px; font-weight: 600; }
@@ -331,6 +342,49 @@
         .detected-badge.visible { opacity: 1; transform: translateY(0); }
 
         footer { text-align: center; padding: 20px; font-size: 0.85rem; color: var(--text-muted); }
+
+        /* --- 模态框 (Changelog) --- */
+        .modal-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(8px);
+            z-index: 1000; opacity: 0; visibility: hidden; transition: 0.3s;
+            display: flex; align-items: center; justify-content: center; padding: 20px;
+        }
+        .modal-overlay.open { opacity: 1; visibility: visible; }
+        
+        .modal-content {
+            background: var(--bg-surface); width: 100%; max-width: 600px; max-height: 80vh;
+            border-radius: 20px; border: 1px solid var(--border-color);
+            display: flex; flex-direction: column;
+            transform: scale(0.95); transition: 0.3s var(--ease-smooth);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        }
+        .modal-overlay.open .modal-content { transform: scale(1); }
+        
+        .modal-header {
+            padding: 20px 24px; border-bottom: 1px solid var(--border-color);
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .modal-title { font-family: 'Space Grotesk'; font-size: 1.25rem; font-weight: 700; }
+        .modal-close {
+            background: none; border: none; color: var(--text-muted); font-size: 1.5rem;
+            cursor: pointer; transition: 0.2s;
+        }
+        .modal-close:hover { color: var(--text-main); }
+        
+        .modal-body {
+            padding: 24px; overflow-y: auto; font-size: 0.95rem; line-height: 1.6; color: var(--text-muted);
+            white-space: pre-wrap; font-family: monospace;
+        }
+
+        /* 次级按钮 */
+        .secondary-btn {
+            background: transparent; border: 1px solid var(--border-color);
+            color: var(--text-muted); padding: 8px 16px; border-radius: 8px;
+            font-size: 0.85rem; cursor: pointer; transition: 0.2s;
+            display: flex; align-items: center; justify-content: center; gap: 6px;
+            margin-bottom: 20px; width: 100%;
+        }
+        .secondary-btn:hover { border-color: var(--primary); color: var(--primary); background: var(--glass-shine); }
     </style>
 </head>
 <body>
@@ -366,6 +420,56 @@
 </nav>
 
 <div class="download-wrapper">
+    <!-- Stable Release Card -->
+    <div class="download-card release-card">
+        <div class="card-header">
+            <span class="card-badge" data-i18n="dl.stable">Stable Release</span>
+            <h1 class="card-title" data-i18n="dl.stable_title">Official Release</h1>
+            <p style="color: var(--text-muted); font-size: 0.9rem;" data-i18n="dl.stable_desc">Recommended for most users.</p>
+        </div>
+
+        <div class="build-info">
+            <div class="info-row">
+                <span data-i18n="info.updated">Updated</span>
+                <span id="release-time">Loading...</span>
+            </div>
+            <div class="info-row">
+                <span data-i18n="info.version">Version</span>
+                <span id="release-version">...</span>
+            </div>
+            <div class="commit-msg" id="release-msg">Fetching latest release info...</div>
+        </div>
+
+        <button class="secondary-btn" id="release-changelog-btn">
+            <i class="ri-file-list-3-line"></i> <span data-i18n="btn.changelog">View Changelog</span>
+        </button>
+
+        <div class="control-group">
+            <label class="label" data-i18n="lbl.release_assets">Available Assets</label>
+            <div class="c-select" id="release-asset-select">
+                <div class="c-select-trigger">
+                    <span class="selected-text" data-i18n="opt.loading">Loading assets...</span>
+                    <i class="ri-arrow-down-s-line"></i>
+                </div>
+                <div class="c-options" id="release-asset-options">
+                    <!-- Dynamic Assets -->
+                </div>
+            </div>
+        </div>
+
+        <a href="#" class="dl-btn" id="release-download-btn">
+            <i class="ri-rocket-2-fill"></i>
+            <span data-i18n="btn.download_stable">Download Stable</span>
+        </a>
+
+        <div style="text-align: center; margin-top: 15px; font-size: 0.8rem; color: var(--text-muted); opacity: 0.7;">
+            <a href="https://github.com/ShardLauncher/ShardLauncher/releases" target="_blank" style="color: var(--primary); text-decoration: none;">
+                <span data-i18n="msg.all_releases">View all releases on GitHub</span> <i class="ri-external-link-line"></i>
+            </a>
+        </div>
+    </div>
+
+    <!-- Nightly Build Card -->
     <div class="download-card">
         <div class="card-header">
             <span class="card-badge" data-i18n="dl.snapshot">Dev Snapshot</span>
@@ -437,6 +541,19 @@
     &copy; 2025 LanRhyme. ShardLauncher Project.
 </footer>
 
+<!-- Modal Structure -->
+<div class="modal-overlay" id="changelog-modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <span class="modal-title" data-i18n="modal.title">Release Changelog</span>
+            <button class="modal-close" id="modal-close-btn">&times;</button>
+        </div>
+        <div class="modal-body" id="modal-body-content">
+            Loading...
+        </div>
+    </div>
+</div>
+
 <script>
     // --- 0. 多语言资源库 ---
     const resources = {
@@ -445,10 +562,14 @@
             "dl.snapshot": "开发快照版",
             "dl.title": "每夜构建",
             "dl.desc": "来自 CI/CD 的自动构建版本，包含最新特性。",
+            "dl.stable": "稳定版",
+            "dl.stable_title": "正式发布",
+            "dl.stable_desc": "经过测试的稳定版本，推荐所有用户使用。",
             "info.updated": "更新时间",
-            "info.version": "版本哈希",
+            "info.version": "版本",
             "lbl.source": "下载来源",
             "lbl.arch": "设备架构 / 文件",
+            "lbl.release_assets": "发布文件",
             "opt.src.nightly": "Nightly.link (直接下载)",
             "opt.src.actions": "GitHub Actions (需登录)",
             "opt.arch.all": "通用版 (兼容所有架构)",
@@ -456,20 +577,29 @@
             "opt.arch.armv7": "ARMv7 (旧款设备)",
             "opt.arch.x64": "x86_64 (模拟器/PC)",
             "opt.arch.x86": "x86",
+            "opt.loading": "加载中...",
             "btn.download": "下载 APK",
+            "btn.download_stable": "下载稳定版",
             "btn.go_actions": "前往 Actions 页面",
             "msg.detected": "已识别设备:",
-            "msg.disclaimer": "下载即代表您接受开发版本可能存在的不稳定性。"
+            "msg.disclaimer": "下载即代表您接受开发版本可能存在的不稳定性。",
+            "msg.all_releases": "在 GitHub 上查看所有发布",
+            "btn.changelog": "查看更新日志",
+            "modal.title": "版本更新日志"
         },
         en: {
             "nav.back": "Back to Home",
             "dl.snapshot": "Dev Snapshot",
             "dl.title": "Nightly Build",
             "dl.desc": "Automatic builds from CI/CD pipeline.",
+            "dl.stable": "Stable",
+            "dl.stable_title": "Official Release",
+            "dl.stable_desc": "Tested and stable version recommended for most users.",
             "info.updated": "Updated",
             "info.version": "Version",
             "lbl.source": "Download Source",
             "lbl.arch": "Architecture / File",
+            "lbl.release_assets": "Available Assets",
             "opt.src.nightly": "Nightly.link (Direct Download)",
             "opt.src.actions": "GitHub Actions (Login Required)",
             "opt.arch.all": "Universal (All Architectures)",
@@ -477,10 +607,15 @@
             "opt.arch.armv7": "ARMv7 (Older Devices)",
             "opt.arch.x64": "x86_64 (Emulators)",
             "opt.arch.x86": "x86",
+            "opt.loading": "Loading...",
             "btn.download": "Download APK",
+            "btn.download_stable": "Download Stable",
             "btn.go_actions": "Go to Actions",
             "msg.detected": "Detected:",
-            "msg.disclaimer": "By downloading, you accept the unstable nature of nightly builds."
+            "msg.disclaimer": "By downloading, you accept the unstable nature of nightly builds.",
+            "msg.all_releases": "View all releases on GitHub",
+            "btn.changelog": "View Changelog",
+            "modal.title": "Release Changelog"
         }
     };
 
@@ -501,67 +636,71 @@
     let currentLang = 'en';
     let currentArch = 'all';
     let currentSource = 'nightly';
+    let latestReleaseBody = ''; // Store release notes
 
     // --- 3. 自定义下拉菜单逻辑 ---
-    function setupCustomSelects() {
-        const selects = document.querySelectorAll('.c-select');
+    function initSingleCustomSelect(select) {
+        const trigger = select.querySelector('.c-select-trigger');
+        const optionsContainer = select.querySelector('.c-options');
+        const options = select.querySelectorAll('.c-option');
+        const triggerText = select.querySelector('.selected-text');
 
-        selects.forEach(select => {
-            const trigger = select.querySelector('.c-select-trigger');
-            const optionsContainer = select.querySelector('.c-options');
-            const options = select.querySelectorAll('.c-option');
-            const triggerText = select.querySelector('.selected-text');
+        // Remove old listeners (optional but good practice if re-initializing)
+        const newTrigger = trigger.cloneNode(true);
+        trigger.parentNode.replaceChild(newTrigger, trigger);
 
-            // Toggle Open
-            trigger.addEventListener('click', (e) => {
-                if(select.classList.contains('disabled')) return;
-                e.stopPropagation();
-                // Close others
-                document.querySelectorAll('.c-select').forEach(s => {
-                    if (s !== select) s.classList.remove('open');
-                });
-                select.classList.toggle('open');
+        newTrigger.addEventListener('click', (e) => {
+            if(select.classList.contains('disabled')) return;
+            e.stopPropagation();
+            document.querySelectorAll('.c-select').forEach(s => {
+                if (s !== select) s.classList.remove('open');
             });
-
-            // Option Click
-            options.forEach(opt => {
-                opt.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    // Update UI
-                    options.forEach(o => o.classList.remove('selected'));
-                    opt.classList.add('selected');
-
-                    // Update Value
-                    const val = opt.getAttribute('data-value');
-                    const i18nKey = opt.getAttribute('data-i18n');
-
-                    select.setAttribute('data-value', val);
-
-                    // Update Text (Support i18n)
-                    if (resources[currentLang][i18nKey]) {
-                        triggerText.textContent = resources[currentLang][i18nKey];
-                        triggerText.setAttribute('data-i18n', i18nKey); // Keep key for language switch
-                    } else {
-                        triggerText.textContent = opt.textContent;
-                    }
-
-                    select.classList.remove('open');
-
-                    // Trigger Logic
-                    if (select.id === 'source-select') {
-                        currentSource = val;
-                        updateDownloadState();
-                    } else if (select.id === 'arch-select') {
-                        currentArch = val;
-                        // 手动选择后隐藏检测提示
-                        document.getElementById('auto-detect-msg').classList.remove('visible');
-                        updateDownloadState();
-                    }
-                });
-            });
+            select.classList.toggle('open');
         });
 
-        // Click Outside to Close
+        options.forEach(opt => {
+            opt.addEventListener('click', (e) => {
+                e.stopPropagation();
+                options.forEach(o => o.classList.remove('selected'));
+                opt.classList.add('selected');
+
+                const val = opt.getAttribute('data-value');
+                const i18nKey = opt.getAttribute('data-i18n');
+
+                select.setAttribute('data-value', val);
+
+                if (i18nKey && resources[currentLang][i18nKey]) {
+                    triggerText.textContent = resources[currentLang][i18nKey];
+                    triggerText.setAttribute('data-i18n', i18nKey);
+                } else {
+                    triggerText.textContent = opt.querySelector('span') ? opt.querySelector('span').textContent : opt.textContent;
+                    triggerText.removeAttribute('data-i18n');
+                }
+
+                select.classList.remove('open');
+
+                // Trigger Logic
+                if (select.id === 'source-select') {
+                    currentSource = val;
+                    updateDownloadState();
+                } else if (select.id === 'arch-select') {
+                    currentArch = val;
+                    document.getElementById('auto-detect-msg').classList.remove('visible');
+                    updateDownloadState();
+                } else if (select.id === 'release-asset-select') {
+                    document.getElementById('release-download-btn').href = val;
+                }
+            });
+        });
+    }
+
+    function setupCustomSelects() {
+        document.querySelectorAll('.c-select').forEach(select => {
+            if (select.id !== 'release-asset-select') { // Release assets initialized separately
+                initSingleCustomSelect(select);
+            }
+        });
+
         document.addEventListener('click', () => {
             document.querySelectorAll('.c-select').forEach(s => s.classList.remove('open'));
         });
@@ -669,20 +808,67 @@
         }
     }
 
-    // --- 7. 获取 Commit ---
+    // --- 7. 获取 Commit 与 Release ---
+    async function fetchLatestRelease() {
+        try {
+            const res = await fetch(`https://api.github.com/repos/${CONFIG.repo}/releases/latest`);
+            if (!res.ok) throw new Error("API Error");
+            const data = await res.json();
+
+            const date = new Date(data.published_at);
+            document.getElementById('release-time').textContent = date.toLocaleDateString(currentLang === 'zh' ? 'zh-CN' : 'en-US');
+            document.getElementById('release-version').textContent = data.tag_name;
+            document.getElementById('release-msg').textContent = data.name || "Stable Release";
+
+            // Store body for modal
+            latestReleaseBody = data.body || "No release notes provided.";
+            document.getElementById('modal-body-content').textContent = latestReleaseBody;
+
+            const optionsContainer = document.getElementById('release-asset-options');
+            const triggerText = document.querySelector('#release-asset-select .selected-text');
+            optionsContainer.innerHTML = '';
+
+            if (data.assets && data.assets.length > 0) {
+                data.assets.forEach((asset, index) => {
+                    const opt = document.createElement('div');
+                    opt.className = 'c-option' + (index === 0 ? ' selected' : '');
+                    opt.setAttribute('data-value', asset.browser_download_url);
+                    opt.innerHTML = `<i class="ri-file-zip-line"></i><span>${asset.name}</span>`;
+                    optionsContainer.appendChild(opt);
+
+                    if (index === 0) {
+                        triggerText.textContent = asset.name;
+                        triggerText.removeAttribute('data-i18n');
+                        document.getElementById('release-download-btn').href = asset.browser_download_url;
+                    }
+                });
+                initSingleCustomSelect(document.getElementById('release-asset-select'));
+            } else {
+                triggerText.textContent = "No assets found";
+            }
+        } catch (e) {
+            document.getElementById('release-msg').textContent = "Failed to fetch release info";
+        }
+    }
+
     async function fetchLatestCommit() {
         try {
             const res = await fetch(`https://api.github.com/repos/${CONFIG.repo}/commits/master`);
             if (!res.ok) throw new Error("API Error");
             const data = await res.json();
 
-            // 简单的时间格式化
             const date = new Date(data.commit.author.date);
             const now = new Date();
-            const diffHours = Math.floor((now - date) / (1000 * 60 * 60));
+            const diffMs = now - date;
+            const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+            const diffDays = Math.floor(diffHours / 24);
 
-            let timeStr = diffHours + " hours ago";
-            if (currentLang === 'zh') timeStr = diffHours + " 小时前";
+            let timeStr;
+            if (currentLang === 'zh') {
+                timeStr = diffDays > 0 ? `${diffDays} 天前` : `${diffHours} 小时前`;
+            } else {
+                timeStr = diffDays > 0 ? `${diffDays} days ago` : `${diffHours} hours ago`;
+            }
 
             document.getElementById('build-time').textContent = timeStr;
             document.getElementById('build-hash').textContent = data.sha.substring(0, 7);
@@ -690,6 +876,29 @@
         } catch (e) {
             document.getElementById('build-msg').textContent = "Failed to fetch info";
         }
+    }
+
+    function setupModal() {
+        const modal = document.getElementById('changelog-modal');
+        const openBtn = document.getElementById('release-changelog-btn');
+        const closeBtn = document.getElementById('modal-close-btn');
+
+        openBtn.addEventListener('click', () => {
+            modal.classList.add('open');
+        });
+
+        const closeModal = () => modal.classList.remove('open');
+        closeBtn.addEventListener('click', closeModal);
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) closeModal();
+        });
+        
+        // Close on ESC
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && modal.classList.contains('open')) {
+                closeModal();
+            }
+        });
     }
 
     // --- 8. 初始化 ---
@@ -701,13 +910,16 @@
         // 语言
         let savedLang = localStorage.getItem('lang') || navigator.language.split('-')[0];
         if (!resources[savedLang]) savedLang = 'en';
+        currentLang = savedLang;
 
-        setupCustomSelects(); // 先初始化 UI 组件
-        applyTranslations(savedLang); // 再应用语言
+        setupCustomSelects(); 
+        applyTranslations(savedLang);
+        setupModal();
 
         // 逻辑
-        detectArchitecture(); // 这会触发一次 updateDownloadState
+        detectArchitecture(); 
         fetchLatestCommit();
+        fetchLatestRelease();
 
         // 语言切换按钮逻辑
         // 初始化并绑定自定义语言选择器（与主页面样式保持一致）
@@ -743,6 +955,7 @@
                         localStorage.setItem('lang', selectedValue);
                         applyTranslations(selectedValue);
                         fetchLatestCommit();
+                        fetchLatestRelease();
                     }
                     wrapper.classList.remove('open');
 
