@@ -679,7 +679,8 @@
                     triggerText.textContent = resources[currentLang][i18nKey];
                     triggerText.setAttribute('data-i18n', i18nKey);
                 } else {
-                    triggerText.textContent = opt.querySelector('span') ? opt.querySelector('span').textContent : opt.textContent;
+                    const span = opt.querySelector('span');
+                    triggerText.textContent = span ? span.textContent : opt.textContent;
                     triggerText.removeAttribute('data-i18n');
                 }
 
@@ -693,6 +694,20 @@
                     currentArch = val;
                     document.getElementById('auto-detect-msg').classList.remove('visible');
                     updateDownloadState();
+                    // 手动确保架构选择器的显示文本正确更新
+                    const archTriggerText = select.querySelector('.selected-text');
+                    const selectedOption = select.querySelector('.c-option.selected');
+                    if (archTriggerText && selectedOption) {
+                        const i18nKey = selectedOption.getAttribute('data-i18n');
+                        if (i18nKey && resources[currentLang][i18nKey]) {
+                            archTriggerText.textContent = resources[currentLang][i18nKey];
+                            archTriggerText.setAttribute('data-i18n', i18nKey);
+                        } else {
+                            const span = selectedOption.querySelector('span');
+                            archTriggerText.textContent = span ? span.textContent : selectedOption.textContent;
+                            archTriggerText.removeAttribute('data-i18n');
+                        }
+                    }
                 } else if (select.id === 'release-asset-select') {
                     document.getElementById('release-download-btn').href = val;
                 }
@@ -722,11 +737,8 @@
 
         const option = select.querySelector(`.c-option[data-value="${value}"]`);
         if (option) {
-            // Trigger click simulation to update UI and internal state
+            // 手动执行点击事件处理逻辑以确保正确更新UI和状态
             option.click();
-            // Re-open if needed, but here we just want to set value silently usually
-            // but click triggers logic. We might need to override the logic trigger if purely visual,
-            // but for architecture detection, triggering logic is fine.
         }
     }
 
@@ -793,10 +805,7 @@
             }
         }
 
-        // 4. 重新初始化自定义选择器以确保事件处理程序使用最新语言
-        setupCustomSelects();
-
-        // 5. 动态按钮翻译 (Go to Actions vs Download)
+        // 4. 动态按钮翻译 (Go to Actions vs Download)
         updateDownloadState();
     }
 
