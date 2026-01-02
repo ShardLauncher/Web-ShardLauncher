@@ -730,9 +730,14 @@
         document.querySelectorAll('[data-i18n]').forEach(el => {
             const key = el.getAttribute('data-i18n');
             if (data[key]) {
-                // 如果是下拉菜单的选项，也需要更新
+                // 如果是下拉菜单的选项，只更新内部的 span，保持 DOM 结构
                 if (el.classList.contains('c-option')) {
-                    el.textContent = data[key];
+                    const span = el.querySelector('span');
+                    if (span) {
+                        span.textContent = data[key];
+                    } else {
+                        el.textContent = data[key];
+                    }
                 } else if (el.tagName === 'SPAN' || el.tagName === 'P' || el.tagName === 'H1' || el.tagName === 'A' || el.tagName === 'LABEL') {
                     el.textContent = data[key];
                 }
@@ -752,7 +757,8 @@
                     triggerText.textContent = data[i18nKey];
                     triggerText.setAttribute('data-i18n', i18nKey);
                 } else {
-                    triggerText.textContent = selectedOption.querySelector('span') ? selectedOption.querySelector('span').textContent : selectedOption.textContent;
+                    const span = selectedOption.querySelector('span');
+                    triggerText.textContent = span ? span.textContent : selectedOption.textContent;
                     triggerText.removeAttribute('data-i18n');
                 }
             }
@@ -771,7 +777,8 @@
                     triggerText.textContent = data[i18nKey];
                     triggerText.setAttribute('data-i18n', i18nKey);
                 } else {
-                    triggerText.textContent = selectedOption.querySelector('span') ? selectedOption.querySelector('span').textContent : selectedOption.textContent;
+                    const span = selectedOption.querySelector('span');
+                    triggerText.textContent = span ? span.textContent : selectedOption.textContent;
                     triggerText.removeAttribute('data-i18n');
                 }
             }
