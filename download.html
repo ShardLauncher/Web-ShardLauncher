@@ -659,7 +659,12 @@
         });
 
         options.forEach(opt => {
-            opt.addEventListener('click', (e) => {
+            // 移除可能已存在的事件监听器以避免重复绑定
+            if (opt._clickHandler) {
+                opt.removeEventListener('click', opt._clickHandler);
+            }
+            
+            const clickHandler = (e) => {
                 e.stopPropagation();
                 options.forEach(o => o.classList.remove('selected'));
                 opt.classList.add('selected');
@@ -669,6 +674,7 @@
 
                 select.setAttribute('data-value', val);
 
+                // 使用全局 currentLang 确保始终获取最新语言
                 if (i18nKey && resources[currentLang][i18nKey]) {
                     triggerText.textContent = resources[currentLang][i18nKey];
                     triggerText.setAttribute('data-i18n', i18nKey);
@@ -690,7 +696,10 @@
                 } else if (select.id === 'release-asset-select') {
                     document.getElementById('release-download-btn').href = val;
                 }
-            });
+            };
+            
+            opt.addEventListener('click', clickHandler);
+            opt._clickHandler = clickHandler; // 保存引用以便后续移除
         });
     }
 
@@ -784,7 +793,10 @@
             }
         }
 
-        // 4. 动态按钮翻译 (Go to Actions vs Download)
+        // 4. 重新初始化自定义选择器以确保事件处理程序使用最新语言
+        setupCustomSelects();
+
+        // 5. 动态按钮翻译 (Go to Actions vs Download)
         updateDownloadState();
     }
 
