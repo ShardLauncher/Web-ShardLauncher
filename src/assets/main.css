@@ -22,8 +22,8 @@
 
   /* 光效系统 */
   --shadow: 0 0 0 transparent;
-  --glow-color: rgba(0, 255, 136, 0.5);
-  --logo-glow: drop-shadow(0 0 25px rgba(0, 255, 136, 0.4));
+  --glow-color: rgba(100, 120, 110, 0.4);
+  --logo-glow: drop-shadow(0 0 25px rgba(100, 120, 110, 0.3));
 
   --ease-elastic: cubic-bezier(0.68, -0.55, 0.265, 1.55);
   --ease-smooth: cubic-bezier(0.2, 0.8, 0.2, 1);

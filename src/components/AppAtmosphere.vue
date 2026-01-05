@@ -24,7 +24,7 @@
 
 :root[data-theme="light"] .orb { opacity: 0.6; mix-blend-mode: multiply; filter: blur(100px); }
 
-.orb-1 { width: 50vw; height: 50vw; background: radial-gradient(circle, var(--primary), transparent 70%); top: -10%; left: -15%; }
+.orb-1 { width: 50vw; height: 50vw; background: radial-gradient(circle, rgba(100, 120, 110, 0.4), transparent 70%); top: -10%; left: -15%; }
 .orb-2 { width: 40vw; height: 40vw; background: radial-gradient(circle, var(--accent), transparent 70%); bottom: -10%; right: -10%; animation-delay: -5s; }
 
 .shards-container { position: absolute; inset: 0; overflow: hidden; pointer-events: none; z-index: 0; height: 100vh; }

@@ -99,9 +99,9 @@ useTilt(tiltCard)
 
 .ring {
   position: absolute; inset: -15%; border-radius: 50%;
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(120, 140, 130, 0.1);
   transform: rotateX(75deg) translateZ(-60px);
-  background: radial-gradient(transparent 60%, rgba(255, 255, 255, 0.02));
+  background: radial-gradient(transparent 60%, rgba(100, 120, 110, 0.05));
   animation: spin 20s linear infinite;
   pointer-events: none;
   filter: blur(1px);
@@ -125,9 +125,9 @@ useTilt(tiltCard)
 
 .breathing-glow {
   position: absolute; top: 50%; left: 50%;
-  width: 60%; height: 60%; background: var(--glow-color);
+  width: 60%; height: 60%; background: rgba(100, 120, 110, 0.3);
   border-radius: 50%; transform: translate(-50%, -50%) translateZ(20px);
-  filter: blur(80px); opacity: 0.4;
+  filter: blur(80px); opacity: 0.3;
   animation: breathe 5s ease-in-out infinite; z-index: 5;
   pointer-events: none;
 }
@@ -167,7 +167,7 @@ useTilt(tiltCard)
 
 .btn {
   padding: 18px 36px; border-radius: 100px; font-weight: 700; font-size: 1rem;
-  display: flex; align-items: center; gap: 10px; transition: 0.4s var(--ease-smooth);
+  display: flex; align-items: center; justify-content: center; gap: 10px; transition: 0.4s var(--ease-smooth);
   text-decoration: none;
 }
 
