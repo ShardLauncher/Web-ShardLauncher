@@ -18,6 +18,11 @@ const router = createRouter({
       path: '/generator',
       name: 'generator',
       component: () => import('../views/GeneratorView.vue')
+    },
+    {
+      path: '/docs/:lang/:path*',
+      name: 'docs',
+      component: () => import('../views/DocsView.vue')
     }
   ]
 })

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n'
 
-const { t } = useI18n()
+const { t, locale } = useI18n()
 const currentYear = new Date().getFullYear()
 </script>
 
@@ -27,6 +27,7 @@ const currentYear = new Date().getFullYear()
           <h4>{{ t('footer.product') }}</h4>
           <router-link to="/">{{ t('footer.features') }}</router-link>
           <router-link to="/download">{{ t('footer.download') }}</router-link>
+          <router-link :to="`/docs/${locale}/index`">{{ t('footer.docs') }}</router-link>
           <a href="https://github.com/ShardLauncher/ShardLauncher/releases" target="_blank">{{ t('footer.changelog') }}</a>
         </div>
         <div class="f-col">

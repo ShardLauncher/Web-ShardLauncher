@@ -34,6 +34,7 @@
   "nav": {
     "home": "首页",
     "download": "下载",
+    "docs": "文档",
     "designer": "生成器",
     "back": "返回首页"
   },
@@ -113,6 +114,7 @@
     "product": "产品",
     "features": "特性",
     "download": "下载",
+    "docs": "在线文档",
     "changelog": "更新日志",
     "legal": "法律",
     "privacy": "隐私政策",

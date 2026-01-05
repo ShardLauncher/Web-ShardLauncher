@@ -34,6 +34,7 @@
   "nav": {
     "home": "Home",
     "download": "Download",
+    "docs": "Docs",
     "designer": "Generator",
     "back": "Back to Home"
   },
@@ -113,6 +114,7 @@
     "product": "Product",
     "features": "Features",
     "download": "Download",
+    "docs": "Documentation",
     "changelog": "Changelog",
     "legal": "Legal",
     "privacy": "Privacy",
