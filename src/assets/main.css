@@ -1,0 +1,94 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* 核心品牌色 - 极光绿 */
+  --hue: 155;
+  --primary: hsl(var(--hue), 100%, 50%);
+  --primary-rgb: 0, 255, 136;
+  --accent: #3b82f6;
+
+  /* 默认深色模式 (Cyberpunk / Deep Space) */
+  --bg-body: #080808;
+  --bg-surface: #121212;
+  --bg-card: rgba(30, 30, 30, 0.4);
+
+  --text-main: #ffffff;
+  --text-muted: #9ca3af;
+
+  --border-color: rgba(255, 255, 255, 0.1);
+  --glass-shine: rgba(255, 255, 255, 0.05);
+
+  /* 光效系统 */
+  --shadow: 0 0 0 transparent;
+  --glow-color: rgba(0, 255, 136, 0.5);
+  --logo-glow: drop-shadow(0 0 25px rgba(0, 255, 136, 0.4));
+
+  --ease-elastic: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  --ease-smooth: cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.dark {
+  /* Dark mode is default, but we can explicit define if needed */
+}
+
+[data-theme="light"], .light {
+  --primary: #059669; /* 翡翠绿，更稳重 */
+  --primary-rgb: 5, 150, 105;
+  --accent: #2563eb;
+
+  --bg-body: #F0F2F5; /* 冷灰白，更有质感 */
+  --bg-surface: #FFFFFF;
+  --bg-card: rgba(255, 255, 255, 0.65); /* 陶瓷磨砂 */
+
+  --text-main: #111827; /* 深灰黑，非纯黑 */
+  --text-muted: #4b5563;
+
+  --border-color: rgba(0, 0, 0, 0.06);
+  --glass-shine: linear-gradient(120deg, rgba(255,255,255,0.8), rgba(255,255,255,0.4));
+
+  /* 浅色模式下的光效改为柔和投影 */
+  --shadow: 0 15px 35px -5px rgba(0, 0, 0, 0.05), 0 5px 15px -5px rgba(0, 0, 0, 0.03);
+  --glow-color: rgba(5, 150, 105, 0.2); /* 淡淡的绿色光晕 */
+  --logo-glow: drop-shadow(0 10px 20px rgba(5, 150, 105, 0.15));
+}
+
+body {
+  background-color: var(--bg-body);
+  color: var(--text-main);
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  overflow-x: hidden;
+  transition: background-color 0.6s var(--ease-smooth), color 0.4s;
+  position: relative;
+  min-height: 100vh;
+}
+
+/* 噪声背景层 */
+.noise {
+  position: fixed; inset: 0; opacity: 0.035; pointer-events: none; z-index: 900;
+  background: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+}
+
+/* 磨砂玻璃通用样式 */
+.glass {
+  background: var(--bg-card);
+  backdrop-filter: blur(16px) saturate(180%);
+  border: 1px solid var(--border-color);
+}
+
+/* 进场动画类 */
+.stagger-animate { 
+  opacity: 0; 
+  transform: translateY(30px); 
+  animation: fadeInUp 0.8s var(--ease-smooth) forwards; 
+}
+.delay-1 { animation-delay: 0.1s; }
+.delay-2 { animation-delay: 0.2s; }
+.delay-3 { animation-delay: 0.3s; }
+.delay-4 { animation-delay: 0.4s; }
+.delay-5 { animation-delay: 0.5s; }
+
+@keyframes fadeInUp { 
+  to { opacity: 1; transform: translateY(0); } 
+}

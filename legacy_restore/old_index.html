@@ -1,0 +1,1065 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ShardLauncher | The Next Gen</title>
+
+    <!-- 引入高阶字体 -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@300;500;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+
+    <style>
+        /* --- 0. 设计变量 (Design Tokens) --- */
+        :root {
+            /* 核心品牌色 - 极光绿 */
+            --hue: 155;
+            --primary: hsl(var(--hue), 100%, 50%);
+            --accent: #3b82f6;
+
+            /* 默认深色模式 (Cyberpunk / Deep Space) */
+            --bg-body: #080808;
+            --bg-surface: #121212;
+            --bg-card: rgba(30, 30, 30, 0.4);
+
+            --text-main: #ffffff;
+            --text-muted: #9ca3af;
+
+            --border-color: rgba(255, 255, 255, 0.1);
+            --glass-shine: rgba(255, 255, 255, 0.05);
+
+            /* 光效系统 */
+            --shadow: 0 0 0 transparent;
+            --glow-color: rgba(0, 255, 136, 0.5);
+            --logo-glow: drop-shadow(0 0 25px rgba(0, 255, 136, 0.4));
+
+            --ease-elastic: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            --ease-smooth: cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        /* 浅色模式优化 (Ceramic / Jade) */
+        [data-theme="light"] {
+            --primary: #059669; /* 翡翠绿，更稳重 */
+            --accent: #2563eb;
+
+            --bg-body: #F0F2F5; /* 冷灰白，更有质感 */
+            --bg-surface: #FFFFFF;
+            --bg-card: rgba(255, 255, 255, 0.65); /* 陶瓷磨砂 */
+
+            --text-main: #111827; /* 深灰黑，非纯黑 */
+            --text-muted: #4b5563;
+
+            --border-color: rgba(0, 0, 0, 0.06);
+            --glass-shine: linear-gradient(120deg, rgba(255,255,255,0.8), rgba(255,255,255,0.4));
+
+            /* 浅色模式下的光效改为柔和投影 */
+            --shadow: 0 15px 35px -5px rgba(0, 0, 0, 0.05), 0 5px 15px -5px rgba(0, 0, 0, 0.03);
+            --glow-color: rgba(5, 150, 105, 0.2); /* 淡淡的绿色光晕 */
+            --logo-glow: drop-shadow(0 10px 20px rgba(5, 150, 105, 0.15));
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            overflow-x: hidden;
+            transition: background-color 0.6s var(--ease-smooth), color 0.4s;
+            position: relative;
+        }
+
+        /* --- 1. 氛围层 (Atmosphere) --- */
+        .noise {
+            position: fixed; inset: 0; opacity: 0.035; pointer-events: none; z-index: 900;
+            background: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+        }
+
+        .ambient-light {
+            position: fixed; width: 100vw; height: 100vh; z-index: -1; overflow: hidden;
+        }
+        .orb {
+            position: absolute; border-radius: 50%;
+            filter: blur(80px); opacity: 0.5;
+            mix-blend-mode: screen; /* 更好的色彩叠加 */
+            animation: drift 20s infinite alternate ease-in-out;
+            will-change: transform;
+        }
+        [data-theme="light"] .orb { opacity: 0.6; mix-blend-mode: multiply; filter: blur(100px); }
+
+        .orb-1 { width: 50vw; height: 50vw; background: radial-gradient(circle, var(--primary), transparent 70%); top: -10%; left: -15%; }
+        .orb-2 { width: 40vw; height: 40vw; background: radial-gradient(circle, var(--accent), transparent 70%); bottom: -10%; right: -10%; animation-delay: -5s; }
+
+        @keyframes drift { 0% { transform: translate(0,0) scale(1); } 100% { transform: translate(30px, 40px) scale(1.05); } }
+
+        /* --- 2. 悬浮碎片 (Shards) --- */
+        .shards-container { position: absolute; inset: 0; overflow: hidden; pointer-events: none; z-index: 0; height: 100vh; }
+        .floating-shard {
+            position: absolute; background: var(--glass-shine);
+            backdrop-filter: blur(3px);
+            border: 1px solid var(--border-color);
+            z-index: 1;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+        }
+        .s1 { width: 60px; height: 60px; top: 15%; left: 8%; clip-path: polygon(50% 0%, 0% 100%, 100% 100%); animation: float 8s infinite ease-in-out; }
+        .s2 { width: 40px; height: 80px; bottom: 20%; right: 5%; clip-path: polygon(20% 0%, 100% 0, 80% 100%, 0% 100%); animation: float 10s infinite ease-in-out reverse; }
+
+        @keyframes float { 0%, 100% { transform: translateY(0) rotate(var(--r, 0deg)); } 50% { transform: translateY(-15px) rotate(calc(var(--r, 0deg) + 8deg)); } }
+
+        /* --- 3. 导航栏 (Navbar) --- */
+        nav {
+            position: fixed; top: 0; width: 100%; padding: 24px 6%;
+            display: flex; justify-content: space-between; align-items: center;
+            z-index: 100; transition: 0.4s var(--ease-smooth);
+        }
+        nav.scrolled {
+            padding: 16px 6%;
+            background: rgba(var(--bg-surface), 0.01);
+            backdrop-filter: blur(16px) saturate(180%);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .brand {
+            font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 1.5rem;
+            color: var(--text-main); text-decoration: none; display: flex; align-items: center; gap: 12px;
+        }
+        .brand img { width: 32px; height: 32px; border-radius: 6px; }
+
+        .nav-tools { display: flex; align-items: center; gap: 12px; }
+        .tool-btn {
+            background: transparent; border: 1px solid var(--border-color);
+            color: var(--text-main); width: 42px; height: 42px; border-radius: 50%;
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
+            transition: 0.3s cubic-bezier(0.3, 2, 0.3, 1);
+        }
+        .tool-btn:hover { background: var(--text-main); color: var(--bg-body); transform: scale(1.1); border-color: transparent; }
+
+        /* Custom Language Selector */
+        .custom-select-wrapper {
+            position: relative;
+            user-select: none;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        .custom-select-trigger {
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            height: 42px;
+            padding: 0 40px 0 20px;
+            border: 1px solid var(--border-color);
+            border-radius: 100px;
+            background-color: var(--bg-card);
+            backdrop-filter: blur(10px);
+            color: var(--text-main);
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s var(--ease-smooth);
+        }
+
+        .custom-select-trigger:hover {
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .custom-select-trigger .custom-select-label {
+            white-space: nowrap;
+        }
+
+        .custom-select-trigger::after {
+            content: '';
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 16px;
+            height: 16px;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='rgba(255,255,255,0.7)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: center;
+            background-size: 16px;
+            transition: transform 0.3s var(--ease-smooth);
+        }
+
+        [data-theme="light"] .custom-select-trigger {
+            color: var(--text-main);
+        }
+        [data-theme="light"] .custom-select-trigger::after {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='rgba(0,0,0,0.6)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+        }
+
+        .custom-options {
+            position: absolute;
+            top: calc(100% + 8px);
+            left: 0;
+            right: 0;
+            min-width: 160px;
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            background-color: var(--bg-card);
+            backdrop-filter: blur(16px) saturate(180%);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+            padding: 8px;
+            z-index: 200;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(10px) scale(0.98);
+            transition: all 0.3s var(--ease-smooth);
+        }
+
+        .custom-select-wrapper.open .custom-options {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0) scale(1);
+        }
+
+        .custom-select-wrapper.open .custom-select-trigger::after {
+            transform: translateY(-50%) rotate(180deg);
+        }
+
+        .custom-option {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            border-radius: 8px;
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.2s var(--ease-smooth);
+        }
+        
+        .custom-option + .custom-option {
+            margin-top: 4px;
+        }
+
+        .custom-option:hover {
+            background-color: var(--glass-shine);
+            color: var(--text-main);
+        }
+
+        .custom-option.selected {
+            color: var(--primary);
+            font-weight: 600;
+            background-color: var(--glass-shine);
+        }
+
+        .custom-option i {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            transition: color 0.2s var(--ease-smooth);
+        }
+
+        .custom-option:hover i,
+        .custom-option.selected i {
+            color: var(--primary);
+        }
+
+        .lang-select {
+            display: none; /* Hide original select */
+        }
+
+
+        /* --- 4. Hero 区域 --- */
+        .hero {
+            position: relative;
+            min-height: 100vh;
+            display: grid; grid-template-columns: 1.2fr 1fr; gap: 60px;
+            align-items: center; padding: 0 6%;
+            max-width: 1600px; margin: 0 auto;
+        }
+
+        .hero-content { z-index: 2; padding-top: 60px; }
+
+        .badge {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 6px 16px; border-radius: 100px;
+            background: rgba(0, 255, 128, 0.08); border: 1px solid rgba(0, 255, 128, 0.2);
+            color: var(--primary); font-family: 'Space Grotesk', monospace; font-size: 0.8rem; font-weight: 600;
+            margin-bottom: 30px; letter-spacing: 0.05em;
+        }
+        [data-theme="light"] .badge { background: rgba(5, 150, 105, 0.1); border-color: rgba(5, 150, 105, 0.2); }
+
+        .hero h1 {
+            font-size: clamp(3rem, 6vw, 5.5rem);
+            font-weight: 800; line-height: 1.05; letter-spacing: -0.03em;
+            margin-bottom: 24px;
+        }
+        .highlight {
+            background: linear-gradient(135deg, var(--text-main) 20%, var(--primary));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+
+        .hero p {
+            font-size: 1.2rem; color: var(--text-muted); line-height: 1.6;
+            max-width: 540px; margin-bottom: 48px;
+        }
+
+        /* 按钮动画 */
+        .btn-group { display: flex; gap: 16px; flex-wrap: wrap; }
+        .btn {
+            text-decoration: none; padding: 16px 36px; border-radius: 100px;
+            font-weight: 600; display: inline-flex; align-items: center; gap: 8px;
+            transition: all 0.3s var(--ease-smooth); position: relative; overflow: hidden;
+            z-index: 1;
+        }
+        .btn-pri { background: var(--text-main); color: var(--bg-body); }
+        .btn-pri:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px -5px rgba(0,0,0,0.2);
+        }
+        /* 流光扫过效果 */
+        .btn-pri::before {
+            content:''; position: absolute; top:0; left:-100%; width:50%; height:100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.8), transparent);
+            transform: skewX(-25deg); transition: 0.5s; z-index: -1;
+        }
+        .btn-pri:hover::before { left: 150%; transition: 0.7s; }
+
+        .btn-sec {
+            border: 1px solid var(--border-color); color: var(--text-main);
+            background: rgba(255,255,255,0.01); backdrop-filter: blur(4px);
+        }
+        .btn-sec:hover { border-color: var(--text-main); background: rgba(var(--text-main), 0.05); }
+
+        /* --- 5. 3D 视觉区 & 呼吸特效 --- */
+        .hero-visual {
+            height: 100%; min-height: 500px;
+            display: flex; align-items: center; justify-content: center;
+            perspective: 1200px;
+            position: relative;
+        }
+
+        .visual-glass-card {
+            width: 70%; aspect-ratio: 1/1;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.1s linear; /* 这里的 transition 用于平滑 JS 的 tilt */
+        }
+
+        /* 核心 Logo */
+        .main-logo {
+            width: 120%; /* Increased size */
+            height: 120%; /* Increased size */
+            object-fit: contain;
+            position: absolute; top: 5%; left: -10%; /* Adjust position due to increased size */
+            filter: var(--logo-glow);
+            transform: translateZ(50px);
+            z-index: 10;
+            animation: float-logo 3s ease-in-out infinite; /* Add floating animation */
+        }
+
+        @keyframes float-logo {
+            0%, 100% {
+                transform: translateZ(50px) translateY(0);
+            }
+            50% {
+                transform: translateZ(50px) translateY(-15px); /* Float up by 15px */
+            }
+        }
+
+        /* 呼吸光效层 (新增) */
+        .breathing-glow {
+            position: absolute;
+            top: 50%; left: 50%;
+            width: 60%; height: 60%;
+            background: var(--glow-color);
+            border-radius: 50%;
+            transform: translate(-50%, -50%) translateZ(20px);
+            filter: blur(60px);
+            opacity: 0.6;
+            animation: breathe 4s ease-in-out infinite;
+            z-index: 5;
+            pointer-events: none;
+        }
+
+        @keyframes breathe {
+            0%, 100% { opacity: 0.4; transform: translate(-50%, -50%) translateZ(20px) scale(0.9); }
+            50% { opacity: 0.8; transform: translate(-50%, -50%) translateZ(20px) scale(1.2); }
+        }
+
+        /* 玻璃环 */
+        .ring {
+            position: absolute; inset: -10%; border-radius: 50%;
+            border: 1px solid var(--border-color);
+            transform: rotateX(75deg) translateZ(-60px);
+            background: radial-gradient(transparent 50%, var(--glass-shine));
+            animation: spin 15s linear infinite;
+        }
+        [data-theme="light"] .ring { border-color: rgba(0,0,0,0.1); background: radial-gradient(transparent 50%, rgba(0,0,0,0.03)); }
+
+        @keyframes spin { to { transform: rotateX(75deg) translateZ(-60px) rotate(360deg); } }
+
+        /* --- 6. 进场动画类 --- */
+        .stagger-animate { opacity: 0; transform: translateY(30px); animation: fadeInUp 0.8s var(--ease-smooth) forwards; }
+        .delay-1 { animation-delay: 0.1s; }
+        .delay-2 { animation-delay: 0.2s; }
+        .delay-3 { animation-delay: 0.3s; }
+
+        @keyframes fadeInUp { to { opacity: 1; transform: translateY(0); } }
+
+        /* --- 7. 特性卡片 (Bento Grid) --- */
+        .features { max-width: 1600px; margin: 0 auto; padding: 0 6% 120px; }
+        .grid-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+        .feature-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            padding: 40px; border-radius: 24px;
+            backdrop-filter: blur(20px);
+            transition: 0.4s var(--ease-smooth);
+            position: relative; overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+        .feature-card:hover { transform: translateY(-8px); border-color: rgba(255,255,255,0.2); }
+        [data-theme="light"] .feature-card:hover { border-color: rgba(0,0,0,0.15); }
+
+        .span-2 { grid-column: span 2; }
+
+        .f-icon {
+            width: 56px; height: 56px; background: rgba(var(--hue), 255, 255, 0.1);
+            color: var(--text-main); border: 1px solid var(--border-color);
+            border-radius: 16px; display: flex; align-items: center; justify-content: center;
+            font-size: 1.6rem; margin-bottom: 24px;
+        }
+        [data-theme="light"] .f-icon { background: #fff; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+
+        .feature-card h3 { font-family: 'Space Grotesk'; font-size: 1.5rem; margin-bottom: 12px; }
+        .feature-card p { color: var(--text-muted); line-height: 1.6; font-size: 0.95rem; }
+
+        /* --- 8. Footer --- */
+        footer {
+            border-top: 1px solid var(--border-color);
+            padding: 80px 6% 40px; position: relative; overflow: hidden;
+            background: linear-gradient(to top, rgba(0,0,0,0.05), transparent);
+        }
+        .footer-bg-text {
+            position: absolute; bottom: -10%; left: 50%; transform: translateX(-50%);
+            font-size: 25vw; font-weight: 800; opacity: 0.03;
+            pointer-events: none; font-family: 'Space Grotesk';
+            background: linear-gradient(to bottom, var(--text-main), transparent);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+        .footer-content { display: flex; justify-content: space-between; align-items: flex-start; position: relative; z-index: 2; }
+        .f-left h2 { font-family: 'Space Grotesk'; font-size: 1.8rem; margin-bottom: 24px; }
+        .socials a { font-size: 1.6rem; color: var(--text-muted); margin-right: 24px; transition: 0.3s; display: inline-block; }
+        .socials a:hover { color: var(--primary); transform: translateY(-3px); }
+        .f-right { display: flex; gap: 80px; text-align: left; }
+        .f-col h4 { font-size: 0.9rem; color: var(--text-main); margin-bottom: 16px; opacity: 0.8; text-transform: uppercase; letter-spacing: 0.05em; }
+        .f-col a { display: block; color: var(--text-muted); text-decoration: none; margin-bottom: 12px; font-size: 0.95rem; transition: 0.2s; }
+        .f-col a:hover { color: var(--primary); }
+        .copyright { margin-top: 80px; text-align: center; color: var(--text-muted); font-size: 0.85rem; position: relative; z-index: 2; border-top: 1px solid var(--border-color); padding-top: 30px; }
+
+        /* --- 响应式 --- */
+        @media (max-width: 1024px) {
+            .hero { 
+                display: flex;
+                flex-direction: column;
+                text-align: center; 
+                padding-top: 120px; 
+                gap: 0; 
+            }
+            .hero-visual {
+                order: 1; /* 将视觉元素放在前面 */
+                min-height: auto;
+                height: 200px; /* 给一个固定高度 */
+                width: 100%;
+                margin-bottom: 20px;
+            }
+            .hero-content { 
+                order: 2; /* 内容在后 */
+                align-items: center; 
+                display: flex; 
+                flex-direction: column;
+                padding-top: 0;
+            }
+            .main-logo {
+                width: 150px; /* 缩小 Logo */
+                height: 150px;
+                position: static; /* 移除绝对定位 */
+                transform: none; /* 重置 transform */
+                animation: none; /* 移除动画 */
+                margin: 0 auto; /* 居中 */
+            }
+            .visual-glass-card {
+                width: auto;
+                height: 100%;
+                perspective: none;
+                transform-style: flat;
+            }
+            .breathing-glow {
+                width: 120px;
+                height: 120px;
+                transform: translate(-50%, -50%);
+                animation: none;
+                opacity: 0.4;
+            }
+
+            .hero h1 { font-size: 3rem; }
+            .btn-group { justify-content: center; }
+            .grid-container { grid-template-columns: 1fr; }
+            .span-2 { grid-column: auto; }
+            .footer-content { flex-direction: column; gap: 50px; }
+            .f-right { flex-direction: column; gap: 30px; text-align: center; width: 100%; }
+            .f-col { align-items: center; display: flex; flex-direction: column; }
+            .ring { display: none; } /* 移动端优化性能 */
+        }
+        /* --- 9. 项目统计 (Project Stats) --- */
+        .stats-section {
+            padding: 40px 6% 120px;
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        /* 统计区块的容器，稍微紧凑一些 */
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 20px;
+            padding: 40px;
+            background: rgba(var(--bg-surface), 0.3);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            backdrop-filter: blur(10px);
+            position: relative;
+        }
+
+        /* 顶部装饰线 */
+        .stats-container::before {
+            content: ''; position: absolute; top: 0; left: 20%; right: 20%; height: 1px;
+            background: linear-gradient(90deg, transparent, var(--primary), transparent);
+            opacity: 0.5;
+        }
+
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 10px;
+            position: relative;
+        }
+
+        /* 分割线 */
+        .stat-item:not(:last-child)::after {
+            content: ''; position: absolute; right: -10px; top: 20%; height: 60%; width: 1px;
+            background: var(--border-color);
+        }
+
+        .stat-icon {
+            font-size: 1.5rem;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+            transition: 0.3s;
+        }
+
+        .stat-number {
+            font-family: 'Space Grotesk', monospace;
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 4px;
+            line-height: 1.1;
+            /* 数字渐变 */
+            background: linear-gradient(180deg, var(--text-main) 0%, rgba(255,255,255,0.7) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        [data-theme="light"] .stat-number {
+            background: linear-gradient(180deg, var(--text-main) 0%, rgba(0,0,0,0.6) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            font-weight: 600;
+        }
+
+        .stat-item:hover .stat-icon { color: var(--primary); transform: scale(1.1); text-shadow: 0 0 10px var(--primary); }
+
+        /* 响应式调整 - 添加到现有的 @media (max-width: 1024px) 内部 */
+        @media (max-width: 1024px) {
+            .stats-container { grid-template-columns: repeat(3, 1fr); gap: 30px; }
+            .stat-item:not(:last-child)::after { display: none; } /* 移动端移除分割线 */
+        }
+
+        @media (max-width: 767px) {
+            .stats-container { grid-template-columns: repeat(2, 1fr); padding: 24px; }
+            /* 让最后一个元素独占一行居中 */
+            .stat-item:last-child { grid-column: span 2; }
+            .stat-number { font-size: 1.8rem; }
+        }
+
+        /* 针对手机竖屏的进一步优化 */
+        @media (max-width: 767px) {
+            nav { padding: 20px 5%; }
+            nav.scrolled { padding: 12px 5%; }
+            .brand { font-size: 1.3rem; }
+            .brand img { width: 28px; height: 28px; }
+            .tool-btn { width: 38px; height: 38px; }
+            .custom-select-trigger { height: 38px; padding: 0 35px 0 15px; font-size: 0.85rem; }
+
+            .hero { padding: 80px 5% 40px; min-height: auto; }
+            .hero-visual { height: 150px; margin-bottom: 10px; }
+            .main-logo { width: 120px; height: 120px; }
+            .breathing-glow { width: 100px; height: 100px; }
+
+            .hero h1 { font-size: 2.5rem; line-height: 1.1; }
+            .hero p { font-size: 1rem; margin-bottom: 32px; }
+            .btn { padding: 14px 28px; font-size: 0.9rem; }
+
+            .features { padding: 0 5% 80px; }
+            .grid-container { gap: 16px; }
+            .feature-card { padding: 24px; border-radius: 20px; }
+            .f-icon { width: 48px; height: 48px; font-size: 1.4rem; margin-bottom: 16px; border-radius: 12px; }
+            .feature-card h3 { font-size: 1.3rem; }
+            .feature-card p { font-size: 0.9rem; }
+
+            footer { padding: 60px 5% 30px; }
+            .f-left h2 { font-size: 1.5rem; }
+            .socials a { font-size: 1.4rem; margin-right: 20px; }
+            .copyright { margin-top: 50px; padding-top: 20px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="noise"></div>
+<div class="ambient-light">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+</div>
+
+<div class="shards-container">
+    <div class="floating-shard s1" style="--r: 15deg"></div>
+    <div class="floating-shard s2" style="--r: -10deg"></div>
+</div>
+
+<nav id="navbar">
+    <a href="#" class="brand">
+        <!-- 这里已改回 logo.png -->
+        <img src="logo.png" alt="S" onerror="this.src='https://avatars.githubusercontent.com/u/148412852?s=50&v=4'">
+        ShardLauncher
+    </a>
+    <div class="nav-tools">
+        <div class="custom-select-wrapper">
+            <select id="lang-select" class="lang-select" aria-label="Select Language">
+                <option value="zh">简体中文</option>
+                <option value="en">English</option>
+            </select>
+            <div class="custom-select-trigger">
+                <i class="ri-global-line"></i>
+                <span class="custom-select-label"></span>
+            </div>
+            <div class="custom-options">
+                <div class="custom-option" data-value="zh"><i class="ri-earth-fill"></i><span>简体中文</span></div>
+                <div class="custom-option" data-value="en"><i class="ri-earth-fill"></i><span>English</span></div>
+            </div>
+        </div>
+        <button class="tool-btn" id="theme-btn" aria-label="Theme"><i class="ri-moon-line"></i></button>
+    </div>
+</nav>
+
+<header class="hero">
+    <div class="hero-visual">
+        <div class="visual-glass-card" id="tilt-card">
+            <div class="ring"></div>
+            <!-- 呼吸光效层 (位于图片后方) -->
+            <div class="breathing-glow"></div>
+            <!-- 主图片：这里已改回 logo.png -->
+            <img src="logo.png" alt="Shard" class="main-logo" onerror="this.src='https://avatars.githubusercontent.com'">
+        </div>
+    </div>
+    <div class="hero-content">
+        <div class="badge stagger-animate">v1.0 STABLE RELEASE</div>
+        <h1 class="stagger-animate delay-1" data-i18n="hero.title">
+            Minecraft, <br>
+            <span class="highlight">Redefined.</span>
+        </h1>
+        <p class="stagger-animate delay-2" data-i18n="hero.desc">
+            The most advanced Minecraft: Java Edition launcher for Android.
+            Seamless performance, glassmorphic design, and absolute control.
+        </p>
+        <div class="btn-group stagger-animate delay-3">
+            <a href="download.html" class="btn btn-pri">
+                <i class="ri-download-cloud-2-fill"></i> <span data-i18n="btn.download">Download APK</span>
+            </a>
+            <a href="https://github.com/ShardLauncher/ShardLauncher" class="btn btn-sec">
+                <i class="ri-github-fill"></i> Source
+            </a>
+        </div>
+    </div>
+</header>
+
+<section class="stats-section">
+    <div class="stats-container stagger-animate delay-3">
+        <!-- Stars -->
+        <div class="stat-item">
+            <i class="ri-star-smile-line stat-icon"></i>
+            <div class="stat-number" id="stat-stars">--</div>
+            <div class="stat-label" data-i18n="stat.stars">Stars</div>
+        </div>
+        <!-- Commits -->
+        <div class="stat-item">
+            <i class="ri-git-commit-line stat-icon"></i>
+            <div class="stat-number" id="stat-commits">--</div>
+            <div class="stat-label" data-i18n="stat.commits">Commits</div>
+        </div>
+        <!-- Pull Requests -->
+        <div class="stat-item">
+            <i class="ri-git-pull-request-line stat-icon"></i>
+            <div class="stat-number" id="stat-prs">--</div>
+            <div class="stat-label" data-i18n="stat.prs">PRs</div>
+        </div>
+        <!-- Issues -->
+        <div class="stat-item">
+            <i class="ri-bug-line stat-icon"></i>
+            <div class="stat-number" id="stat-issues">--</div>
+            <div class="stat-label" data-i18n="stat.issues">Issues</div>
+        </div>
+        <!-- Contributors -->
+        <div class="stat-item">
+            <i class="ri-user-heart-line stat-icon"></i>
+            <div class="stat-number" id="stat-contributors">--</div>
+            <div class="stat-label" data-i18n="stat.contributors">Contribs</div>
+        </div>
+    </div>
+</section>
+
+<section class="features">
+    <div class="grid-container">
+        <div class="feature-card span-2">
+            <div class="f-icon"><i class="ri-layout-masonry-fill"></i></div>
+            <h3 data-i18n="ft.1.t">Fluid Interface</h3>
+            <p data-i18n="ft.1.d">A design language that flows like water. Real-time blur, physics-based animations, and gestures designed for modern touchscreens.</p>
+        </div>
+        <div class="feature-card">
+            <div class="f-icon"><i class="ri-cpu-line"></i></div>
+            <h3 data-i18n="ft.2.t">Core Speed</h3>
+            <p data-i18n="ft.2.d">Highly optimized RenderDragon compatibility and custom JVM arguments for maximum FPS.</p>
+        </div>
+        <div class="feature-card">
+            <div class="f-icon"><i class="ri-equalizer-fill"></i></div>
+            <h3 data-i18n="ft.3.t">Immersive Audio</h3>
+            <p data-i18n="ft.3.d">Built-in high-fidelity audio engine that keeps playing even when the game is loading.</p>
+        </div>
+        <div class="feature-card span-2">
+            <div class="f-icon"><i class="ri-settings-4-fill"></i></div>
+            <h3 data-i18n="ft.4.t">Granular Control</h3>
+            <p data-i18n="ft.4.d">From memory allocation to custom runtime arguments, ShardLauncher gives you the keys to the engine.</p>
+        </div>
+    </div>
+</section>
+
+<footer>
+    <div class="footer-bg-text">SHARD</div>
+    <div class="footer-content">
+        <div class="f-left">
+            <h2>ShardLauncher</h2>
+            <div class="socials">
+                <a href="#"><i class="ri-github-line"></i></a>
+                <a href="#"><i class="ri-twitter-x-line"></i></a>
+                <a href="#"><i class="ri-discord-line"></i></a>
+            </div>
+        </div>
+        <div class="f-right">
+            <div class="f-col">
+                <h4>Product</h4>
+                <a href="#">Features</a>
+                <a href="#">Download</a>
+                <a href="#">Changelog</a>
+            </div>
+            <div class="f-col">
+                <h4>Legal</h4>
+                <a href="#">Privacy</a>
+                <a href="#">Terms</a>
+                <a href="#">License</a>
+            </div>
+        </div>
+    </div>
+    <div class="copyright">
+        &copy; 2025 LanRhyme. Crafted for the Community.
+    </div>
+</footer>
+
+<script>
+    const resources = {
+        zh: {
+            "hero.title": "重构你的<br><span class=\"highlight\">方块世界</span>",
+            "hero.desc": "ShardLauncher | 使用Jetpack Compose开发的高度个性化的Minecraft: Java Edition启动器",
+            "btn.download": "下载 APK",
+            "ft.1.t": "流体界面",
+            "ft.1.d": "如水般流动的交互语言。实时模糊、基于物理的动画以及专为现代触摸屏设计的手势。",
+            "ft.2.t": "极速核心",
+            "ft.2.d": "高度优化的渲染兼容性与自定义 JVM 参数，只为榨干每一帧性能。",
+            "ft.3.t": "沉浸音频",
+            "ft.3.d": "内置高保真音频引擎，即使在游戏加载时也能享受无缝音乐体验。",
+            "ft.4.t": "微粒级控制",
+            "ft.4.d": "从内存分配到自定义运行时参数，ShardLauncher 将引擎的钥匙交给你。",
+            "stat.stars": "标星",
+            "stat.commits": "提交",
+            "stat.prs": "合并请求",
+            "stat.issues": "问题反馈",
+            "stat.contributors": "贡献者"
+        },
+        en: {
+            "hero.title": "Minecraft, <br><span class=\"highlight\">Redefined.</span>",
+            "hero.desc": "The most advanced Minecraft: Java Edition launcher for Android. Seamless performance, glassmorphic design, and absolute control.",
+            "btn.download": "Download APK",
+            "ft.1.t": "Fluid Interface",
+            "ft.1.d": "A design language that flows like water. Real-time blur, physics-based animations, and gestures designed for modern touchscreens.",
+            "ft.2.t": "Core Speed",
+            "ft.2.d": "Highly optimized RenderDragon compatibility and custom JVM arguments for maximum FPS.",
+            "ft.3.t": "Immersive Audio",
+            "ft.3.d": "Built-in high-fidelity audio engine that keeps playing even when the game is loading.",
+            "ft.4.t": "Granular Control",
+            "ft.4.d": "From memory allocation to custom runtime arguments, ShardLauncher gives you the keys to the engine.",
+            "stat.stars": "Stars",
+            "stat.commits": "Commits",
+            "stat.prs": "PRs",
+            "stat.issues": "Issues",
+            "stat.contributors": "Contribs"
+        }
+    };
+
+    const themeBtn = document.getElementById('theme-btn');
+    const langSelect = document.getElementById('lang-select');
+    const html = document.documentElement;
+    const nav = document.getElementById('navbar');
+
+    // Function to apply translations
+    function applyTranslations(lang) {
+        const data = resources[lang];
+        document.querySelectorAll('[data-i18n]').forEach(el => {
+            const key = el.getAttribute('data-i18n');
+            if (data[key]) el.innerHTML = data[key];
+        });
+    }
+
+    // Initialize language and theme on page load
+    document.addEventListener('DOMContentLoaded', () => {
+        // Theme initialization
+        const savedTheme = localStorage.getItem('theme') || 'dark';
+        html.setAttribute('data-theme', savedTheme);
+        themeBtn.querySelector('i').className = savedTheme === 'dark' ? 'ri-moon-line' : 'ri-sun-line';
+
+        // Language initialization
+        let userLang = localStorage.getItem('lang') || navigator.language.split('-')[0];
+        if (!resources[userLang]) {
+            userLang = 'en'; // Default to English if user's language is not supported
+        }
+        html.setAttribute('lang', userLang);
+        langSelect.value = userLang;
+        applyTranslations(userLang);
+        
+        // Initialize custom select
+        initializeCustomSelect(userLang);
+    });
+
+    // 1. Navbar Scroll Effect
+    window.addEventListener('scroll', () => {
+        nav.classList.toggle('scrolled', window.scrollY > 20);
+    });
+
+    // 2. Theme Toggle with Animation & Persistence
+    themeBtn.addEventListener('click', () => {
+        const icon = themeBtn.querySelector('i');
+        // Icon spin animation
+        icon.style.transform = 'rotate(180deg) scale(0.5)';
+        icon.style.opacity = '0';
+
+        setTimeout(() => {
+            const current = html.getAttribute('data-theme');
+            const next = current === 'dark' ? 'light' : 'dark';
+            localStorage.setItem('theme', next); // Save preference
+            html.setAttribute('data-theme', next);
+
+            icon.className = next === 'dark' ? 'ri-moon-line' : 'ri-sun-line';
+            icon.style.transform = 'rotate(0deg) scale(1)';
+            icon.style.opacity = '1';
+        }, 200);
+    });
+
+    // 3. Language Change Logic
+    langSelect.addEventListener('change', (event) => {
+        const selectedLang = event.target.value;
+        localStorage.setItem('lang', selectedLang); // Save preference
+        location.reload(); // Reload page to apply new language
+    });
+
+    // 4. Custom Select Logic
+    function initializeCustomSelect(currentLang) {
+        const wrapper = document.querySelector('.custom-select-wrapper');
+        const trigger = wrapper.querySelector('.custom-select-trigger');
+        const triggerLabel = trigger.querySelector('.custom-select-label');
+        const options = wrapper.querySelectorAll('.custom-option');
+        const customOptions = wrapper.querySelector('.custom-options');
+
+        // Set initial display
+        const initialOption = customOptions.querySelector(`.custom-option[data-value="${currentLang}"]`);
+        if (initialOption) {
+            triggerLabel.textContent = initialOption.querySelector('span').textContent;
+            options.forEach(opt => opt.classList.remove('selected'));
+            initialOption.classList.add('selected');
+        }
+
+        trigger.addEventListener('click', (e) => {
+            e.stopPropagation();
+            wrapper.classList.toggle('open');
+        });
+
+        options.forEach(option => {
+            option.addEventListener('click', () => {
+                const selectedValue = option.getAttribute('data-value');
+                if (selectedValue !== langSelect.value) {
+                    langSelect.value = selectedValue;
+                    langSelect.dispatchEvent(new Event('change'));
+                }
+                wrapper.classList.remove('open');
+            });
+        });
+
+        window.addEventListener('click', () => {
+            if (wrapper.classList.contains('open')) {
+                wrapper.classList.remove('open');
+            }
+        });
+    }
+
+    // 5. Smooth 3D Tilt Effect
+    const card = document.getElementById('tilt-card');
+    let bounds;
+
+    function rotateToMouse(e) {
+        if (window.innerWidth <= 1024) return;
+
+        const mouseX = e.clientX;
+        const mouseY = e.clientY;
+        const leftX = mouseX - bounds.x;
+        const topY = mouseY - bounds.y;
+        const center = {
+            x: leftX - bounds.width / 2,
+            y: topY - bounds.height / 2
+        }
+        const distance = Math.sqrt(center.x**2 + center.y**2);
+
+        // 更平滑的计算方式，减少抖动
+        card.style.transform = `
+            scale3d(1.02, 1.02, 1.02)
+            rotate3d(
+                ${center.y / 100},
+                ${-center.x / 100},
+                0,
+                ${Math.log(distance)* 2}deg
+            )
+        `;
+    }
+
+    if (card) {
+        card.addEventListener('mouseenter', () => {
+            bounds = card.getBoundingClientRect();
+            document.addEventListener('mousemove', rotateToMouse);
+        });
+
+        card.addEventListener('mouseleave', () => {
+            document.removeEventListener('mousemove', rotateToMouse);
+            card.style.transform = '';
+        });
+    }
+
+    // --- 6. GitHub Statistics Fetcher & Animator ---
+
+    // 数字滚动动画函数
+    function animateValue(obj, start, end, duration) {
+        let startTimestamp = null;
+        const step = (timestamp) => {
+            if (!startTimestamp) startTimestamp = timestamp;
+            const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+            // 使用 easeOutQuart 缓动算法让动画更自然
+            const easeProgress = 1 - Math.pow(1 - progress, 4);
+            obj.innerHTML = Math.floor(progress * (end - start) + start);
+            if (progress < 1) {
+                window.requestAnimationFrame(step);
+            } else {
+                obj.innerHTML = end; // 确保最终数字准确
+            }
+        };
+        window.requestAnimationFrame(step);
+    }
+
+    // 格式化数字 (例如 1200 -> 1.2k) - 可选，这里我为了精确性暂时直接显示数字
+    // 如果数字很大，可以使用这个函数
+    function formatNumber(num) {
+        return num > 1000 ? (num/1000).toFixed(1) + 'k' : num;
+    }
+
+    async function fetchGitHubStats() {
+        const repo = 'ShardLauncher/ShardLauncher';
+
+        try {
+            // 1. 获取基础信息 (Stars, Issues)
+            const repoRes = await fetch(`https://api.github.com/repos/${repo}`);
+            if(!repoRes.ok) throw new Error('API Rate Limit');
+            const repoData = await repoRes.json();
+
+            animateValue(document.getElementById('stat-stars'), 0, repoData.stargazers_count, 2000);
+            animateValue(document.getElementById('stat-issues'), 0, repoData.open_issues_count, 2000);
+
+            // 2. 获取 PR 总数 (使用 Search API)
+            // 注意：Search API 限制较严，如果失败则显示 "-"
+            const prRes = await fetch(`https://api.github.com/search/issues?q=repo:${repo}+type:pr`);
+            const prData = await prRes.json();
+            if (prData.total_count) {
+                animateValue(document.getElementById('stat-prs'), 0, prData.total_count, 2000);
+            }
+
+            // 3. 获取 Commits 和 Contributors
+            // 直接获取总量通常需要遍历分页，这里使用一个小技巧：
+            // 请求 per_page=1，然后解析 Link Header 中的 last page number
+
+            // 获取 Contributors 总数
+            const contribRes = await fetch(`https://api.github.com/repos/${repo}/contributors?per_page=1&anon=true`);
+            const contribLink = contribRes.headers.get('link');
+            if (contribLink) {
+                // 正则提取 last page 的页码
+                const match = contribLink.match(/&page=(\d+)>; rel="last"/);
+                if (match) {
+                    animateValue(document.getElementById('stat-contributors'), 0, parseInt(match[1]), 2000);
+                }
+            } else {
+                // 如果没有分页，说明少于1页，直接获取数组长度
+                const contribData = await contribRes.json();
+                animateValue(document.getElementById('stat-contributors'), 0, contribData.length, 2000);
+            }
+
+            // 获取 Commits 总数
+            const commitRes = await fetch(`https://api.github.com/repos/${repo}/commits?per_page=1`);
+            const commitLink = commitRes.headers.get('link');
+            if (commitLink) {
+                const match = commitLink.match(/&page=(\d+)>; rel="last"/);
+                if (match) {
+                    animateValue(document.getElementById('stat-commits'), 0, parseInt(match[1]), 2500);
+                }
+            }
+
+        } catch (error) {
+            console.warn('GitHub Stats Fetch Failed (likely rate limit):', error);
+            // 失败时保持显示 "--" 或设置默认值
+        }
+    }
+
+    // 在页面加载完成后稍作延迟执行，避免阻塞首屏渲染
+    window.addEventListener('load', () => {
+        setTimeout(fetchGitHubStats, 500);
+    });
+
+</script>
+</body>
+</html>

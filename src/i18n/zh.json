@@ -1,0 +1,123 @@
+{
+  "hero": {
+    "title": "重构你的{br}{span}",
+    "title_br": " ",
+    "title_span": "方块世界",
+    "desc": "ShardLauncher | 使用Jetpack Compose开发的高度个性化的Minecraft: Java Edition启动器",
+    "badge": "v1.0 稳定版发布"
+  },
+  "ft": {
+    "1": {
+      "t": "流体界面",
+      "d": "如水般流动的交互语言。实时模糊、基于物理的动画以及专为现代触摸屏设计的手势。"
+    },
+    "2": {
+      "t": "极速核心",
+      "d": "高度优化的渲染兼容性与自定义 JVM 参数，只为榨干每一帧性能。"
+    },
+    "3": {
+      "t": "沉浸音频",
+      "d": "内置高保真音频引擎，即使在游戏加载时也能享受无缝音乐体验。"
+    },
+    "4": {
+      "t": "微粒级控制",
+      "d": "从内存分配到自定义运行时参数，ShardLauncher 将引擎的钥匙交给你。"
+    }
+  },
+  "stat": {
+    "stars": "标星",
+    "commits": "提交",
+    "prs": "合并请求",
+    "issues": "问题反馈",
+    "contributors": "贡献者"
+  },
+  "nav": {
+    "home": "首页",
+    "download": "下载",
+    "designer": "生成器",
+    "back": "返回首页"
+  },
+  "dl": {
+    "snapshot": "开发快照版",
+    "title": "每夜构建",
+    "desc": "来自 CI/CD 的自动构建版本，包含最新特性。",
+    "stable": "稳定版",
+    "stable_title": "正式发布",
+    "stable_desc": "经过测试的稳定版本，推荐所有用户使用。"
+  },
+  "info": {
+    "updated": "更新时间",
+    "version": "版本"
+  },
+  "lbl": {
+    "source": "下载来源",
+    "arch": "设备架构 / 文件",
+    "release_assets": "发布文件"
+  },
+  "opt": {
+    "src": {
+      "nightly": "Nightly.link (直接下载)",
+      "actions": "GitHub Actions (需登录)"
+    },
+    "arch": {
+      "all": "通用版 (兼容所有架构)",
+      "arm64": "ARM64 (现代安卓设备)",
+      "armv7": "ARMv7 (旧款设备)",
+      "x64": "x86_64 (模拟器/PC)",
+      "x86": "x86"
+    },
+    "loading": "加载中..."
+  },
+  "msg": {
+    "detected": "已识别设备:",
+    "disclaimer": "下载即代表您接受开发版本可能存在的不稳定性。",
+    "all_releases": "在 GitHub 上查看所有发布",
+    "fetching": "正在获取最新发布信息...",
+    "fetch_failed": "获取发布信息失败",
+    "rate_limit": "GitHub API 访问受限，请稍后再试或直接前往 GitHub 下载"
+  },
+  "btn": {
+    "download": "下载 APK",
+    "download_stable": "下载稳定版",
+    "go_actions": "前往 Actions 页面",
+    "changelog": "查看更新日志",
+    "source": "源码"
+  },
+  "modal": {
+    "title": "版本更新日志"
+  },
+  "designer": {
+    "title": "Designer",
+    "style": "模版样式",
+    "version": "版本号",
+    "codename": "代号",
+    "type": "类型",
+    "branch": "分支",
+    "logs": "更新日志",
+    "imgs": "快照多图预览",
+    "imgs_hint": "点击上传预览图 (1-3张)",
+    "theme_color": "主题颜色",
+    "radius": "卡片圆角",
+    "card_theme": "卡片背色",
+    "export": "导出高清 PNG",
+    "opt": {
+      "minimal": "精简版 (Minimal)",
+      "detailed": "详尽版 (Detailed)",
+      "dark": "深色模式",
+      "light": "浅色模式"
+    },
+    "default_logs": "- 全新自研 UI 组件库渲染\n- 极致的玻璃拟态光影效果\n- 修复了已知的 12 个渲染 Bug",
+    "images_selected": "张图片已选择"
+  },
+  "footer": {
+    "product": "产品",
+    "features": "特性",
+    "download": "下载",
+    "changelog": "更新日志",
+    "legal": "法律",
+    "privacy": "隐私政策",
+    "terms": "服务条款",
+    "license": "开源协议",
+    "copyright": "© {year} LanRhyme. 为社区精心打造。"
+  }
+}

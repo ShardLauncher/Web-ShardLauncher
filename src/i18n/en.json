@@ -1,0 +1,123 @@
+{
+  "hero": {
+    "title": "Minecraft, {br}{span}",
+    "title_br": " ",
+    "title_span": "Redefined.",
+    "desc": "The most advanced Minecraft: Java Edition launcher for Android. Seamless performance, glassmorphic design, and absolute control.",
+    "badge": "v1.0 STABLE RELEASE"
+  },
+  "ft": {
+    "1": {
+      "t": "Fluid Interface",
+      "d": "A design language that flows like water. Real-time blur, physics-based animations, and gestures designed for modern touchscreens."
+    },
+    "2": {
+      "t": "Core Speed",
+      "d": "Highly optimized RenderDragon compatibility and custom JVM arguments for maximum FPS."
+    },
+    "3": {
+      "t": "Immersive Audio",
+      "d": "Built-in high-fidelity audio engine that keeps playing even when the game is loading."
+    },
+    "4": {
+      "t": "Granular Control",
+      "d": "From memory allocation to custom runtime arguments, ShardLauncher gives you the keys to the engine."
+    }
+  },
+  "stat": {
+    "stars": "Stars",
+    "commits": "Commits",
+    "prs": "PRs",
+    "issues": "Issues",
+    "contributors": "Contribs"
+  },
+  "nav": {
+    "home": "Home",
+    "download": "Download",
+    "designer": "Generator",
+    "back": "Back to Home"
+  },
+  "dl": {
+    "snapshot": "Dev Snapshot",
+    "title": "Nightly Build",
+    "desc": "Automatic builds from CI/CD pipeline.",
+    "stable": "Stable",
+    "stable_title": "Official Release",
+    "stable_desc": "Tested and stable version recommended for most users."
+  },
+  "info": {
+    "updated": "Updated",
+    "version": "Version"
+  },
+  "lbl": {
+    "source": "Download Source",
+    "arch": "Architecture / File",
+    "release_assets": "Available Assets"
+  },
+  "opt": {
+    "src": {
+      "nightly": "Nightly.link (Direct Download)",
+      "actions": "GitHub Actions (Login Required)"
+    },
+    "arch": {
+      "all": "Universal (All Architectures)",
+      "arm64": "ARM64 (Modern Android)",
+      "armv7": "ARMv7 (Older Devices)",
+      "x64": "x86_64 (Emulators)",
+      "x86": "x86"
+    },
+    "loading": "Loading..."
+  },
+  "msg": {
+    "detected": "Detected:",
+    "disclaimer": "By downloading, you accept the unstable nature of nightly builds.",
+    "all_releases": "View all releases on GitHub",
+    "fetching": "Fetching latest release...",
+    "fetch_failed": "Failed to fetch release info",
+    "rate_limit": "GitHub API rate limit exceeded. Please try again later or visit GitHub directly."
+  },
+  "btn": {
+    "download": "Download APK",
+    "download_stable": "Download Stable",
+    "go_actions": "Go to Actions",
+    "changelog": "View Changelog",
+    "source": "Source"
+  },
+  "modal": {
+    "title": "Version Changelog"
+  },
+  "designer": {
+    "title": "Designer",
+    "style": "Template Style",
+    "version": "Version",
+    "codename": "Codename",
+    "type": "Type",
+    "branch": "Branch",
+    "logs": "Changelog",
+    "imgs": "Snapshot Previews",
+    "imgs_hint": "Click to upload previews (1-3 images)",
+    "theme_color": "Theme Color",
+    "radius": "Card Radius",
+    "card_theme": "Card Background",
+    "export": "Export High-Res PNG",
+    "opt": {
+      "minimal": "Minimal",
+      "detailed": "Detailed",
+      "dark": "Dark Mode",
+      "light": "Light Mode"
+    },
+    "default_logs": "- New in-house UI component library rendering\n- Ultimate glassmorphic light and shadow effects\n- Fixed 12 known rendering bugs",
+    "images_selected": "images selected"
+  },
+  "footer": {
+    "product": "Product",
+    "features": "Features",
+    "download": "Download",
+    "changelog": "Changelog",
+    "legal": "Legal",
+    "privacy": "Privacy",
+    "terms": "Terms",
+    "license": "License",
+    "copyright": "© {year} LanRhyme. Crafted for the Community."
+  }
+}
