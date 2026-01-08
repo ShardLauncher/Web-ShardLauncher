@@ -14,6 +14,21 @@ export default defineConfig({
       include: [/\.vue$/, /\.md$/], // <-- allows Vue to compile Markdown files
     }),
   ],
+  server: {
+    // 强制指定 MIME 类型，防止被误判为 text/vnd.trolltech.linguist
+    headers: {
+      'Content-Type': 'application/javascript',
+    },
+    // 显式指定公共目录
+    publicDir: 'public',
+    // 强制 HMR 使用正确的协议
+    hmr: {
+      overlay: true,
+    },
+    fs: {
+      allow: ['..']
+    }
+  },
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
