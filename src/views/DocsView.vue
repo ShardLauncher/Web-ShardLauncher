@@ -16,6 +16,12 @@ const sidebarConfig = {
         { text: '简介', link: '/docs/zh/index' },
         { text: '安装指南', link: '/docs/zh/install' }
       ]
+    },
+    {
+      title: '开发者',
+      items: [
+        { text: '项目文档', link: '/docs/zh/dev_convention' }
+      ]
     }
   ],
   en: [
@@ -24,6 +30,12 @@ const sidebarConfig = {
       items: [
         { text: 'Introduction', link: '/docs/en/index' },
         { text: 'Installation', link: '/docs/en/install' }
+      ]
+    },
+    {
+      title: 'Developer',
+      items: [
+        { text: 'Dev Convention', link: '/docs/en/dev_convention' }
       ]
     }
   ]
