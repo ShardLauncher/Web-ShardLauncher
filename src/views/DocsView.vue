@@ -35,7 +35,7 @@ const sidebarConfig = {
     {
       title: 'Developer',
       items: [
-        { text: 'Dev Convention', link: '/docs/en/dev_convention' }
+        { text: 'Development Convention', link: '/docs/en/dev_convention' }
       ]
     }
   ]
@@ -195,8 +195,8 @@ watch(() => route.path, () => {
   padding: 60px;
   max-width: 1000px;
   background: var(--bg-card);
-  backdrop-filter: blur(20px) saturate(160%);
-  -webkit-backdrop-filter: blur(20px) saturate(160%);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   border-radius: 32px;
   border: 1px solid var(--glass-border);
   border-top: 1px solid var(--glass-highlight);
