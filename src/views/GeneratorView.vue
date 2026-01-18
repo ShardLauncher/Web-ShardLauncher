@@ -116,7 +116,7 @@ onMounted(() => {
 <template>
   <div class="flex h-[calc(100vh-64px)] mt-[64px] overflow-hidden flex-col lg:flex-row bg-body">
     <!-- Sidebar -->
-    <aside class="w-full lg:w-[380px] bg-sidebar border-b lg:border-b-0 lg:border-r border-white/10 p-8 overflow-y-auto z-10 shadow-2xl">
+    <aside class="w-full lg:w-[380px] glass-sidebar p-8 overflow-y-auto z-10 shadow-2xl custom-scrollbar">
       <h2 class="text-2xl font-space font-bold mb-8 flex items-center gap-3">
         <i class="ri-brush-3-fill text-primary" :style="{ color: themeColor }"></i>
         <span>{{ t('designer.title') }}</span>
@@ -129,14 +129,14 @@ onMounted(() => {
           <div class="relative" @click.stop>
             <div 
               @click="styleOpen = !styleOpen"
-              class="flex justify-between items-center p-3 bg-white/5 border border-white/10 rounded-xl cursor-pointer hover:border-primary/50 transition-colors"
+              class="flex justify-between items-center p-3 glass-control rounded-xl cursor-pointer"
             >
               <span class="text-sm">{{ t(`designer.opt.${currentStyle}`) }}</span>
               <i class="ri-arrow-down-s-line transition-transform" :class="{ 'rotate-180': styleOpen }"></i>
             </div>
             <div 
               v-show="styleOpen"
-              class="absolute top-full left-0 right-0 mt-2 bg-sidebar border border-white/10 rounded-xl shadow-2xl z-20 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200"
+              class="absolute top-full left-0 right-0 mt-2 glass-panel rounded-xl shadow-2xl z-20 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200"
             >
               <div 
                 v-for="s in ['minimal', 'detailed']" 
@@ -155,11 +155,11 @@ onMounted(() => {
         <div class="grid grid-cols-2 gap-4">
           <div>
             <label class="text-[10px] font-bold uppercase tracking-widest text-text-muted mb-2 block">{{ t('designer.version') }}</label>
-            <input v-model="version" type="text" class="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-sm outline-none focus:border-primary transition-colors">
+            <input v-model="version" type="text" class="w-full glass-control rounded-xl p-3 text-sm outline-none">
           </div>
           <div>
             <label class="text-[10px] font-bold uppercase tracking-widest text-text-muted mb-2 block">{{ t('designer.codename') }}</label>
-            <input v-model="codename" type="text" class="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-sm outline-none focus:border-primary transition-colors uppercase">
+            <input v-model="codename" type="text" class="w-full glass-control rounded-xl p-3 text-sm outline-none uppercase">
           </div>
         </div>
 
@@ -167,11 +167,11 @@ onMounted(() => {
         <div class="grid grid-cols-2 gap-4">
           <div>
             <label class="text-[10px] font-bold uppercase tracking-widest text-text-muted mb-2 block">{{ t('designer.type') }}</label>
-            <input v-model="type" type="text" class="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-sm outline-none focus:border-primary transition-colors">
+            <input v-model="type" type="text" class="w-full glass-control rounded-xl p-3 text-sm outline-none">
           </div>
           <div>
             <label class="text-[10px] font-bold uppercase tracking-widest text-text-muted mb-2 block">{{ t('designer.branch') }}</label>
-            <input v-model="branch" type="text" class="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-sm outline-none focus:border-primary transition-colors">
+            <input v-model="branch" type="text" class="w-full glass-control rounded-xl p-3 text-sm outline-none">
           </div>
         </div>
 
@@ -179,13 +179,13 @@ onMounted(() => {
         <div v-if="currentStyle === 'detailed'" class="space-y-6 animate-in fade-in slide-in-from-top-2 duration-300">
           <div>
             <label class="text-[10px] font-bold uppercase tracking-widest text-text-muted mb-2 block">{{ t('designer.logs') }}</label>
-            <textarea v-model="logs" rows="4" class="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-sm outline-none focus:border-primary transition-colors resize-none"></textarea>
+            <textarea v-model="logs" rows="4" class="w-full glass-control rounded-xl p-3 text-sm outline-none resize-none"></textarea>
           </div>
           <div>
             <label class="text-[10px] font-bold uppercase tracking-widest text-text-muted mb-2 block">{{ t('designer.imgs') }}</label>
             <div 
               @click="fileInput?.click()"
-              class="border-2 border-dashed border-white/10 rounded-xl p-6 text-center cursor-pointer hover:border-primary/50 hover:bg-primary/5 transition-all group"
+              class="border-2 border-dashed border-[color:var(--glass-border)] bg-surface/5 rounded-xl p-6 text-center cursor-pointer hover:border-primary/50 hover:bg-primary/5 transition-all group"
             >
               <i class="ri-image-add-line text-2xl mb-2 block opacity-50 group-hover:opacity-100 group-hover:text-primary transition-all"></i>
               <span class="text-xs text-text-muted group-hover:text-text-main">{{ uploadedImages.length > 0 ? `${uploadedImages.length} ${t('designer.images_selected')}` : t('designer.imgs_hint') }}</span>
@@ -199,7 +199,7 @@ onMounted(() => {
           <label class="text-[10px] font-bold uppercase tracking-widest text-text-muted mb-2 block">{{ t('designer.theme_color') }}</label>
           <div 
             @click="colorInput?.click()"
-            class="flex items-center gap-4 bg-white/5 border border-white/10 rounded-xl p-3 cursor-pointer hover:border-primary/50 transition-colors"
+            class="flex items-center gap-4 glass-control rounded-xl p-3 cursor-pointer"
           >
             <div class="w-6 h-6 rounded-full border-2 border-white/20" :style="{ backgroundColor: themeColor }"></div>
             <span class="font-space font-bold text-sm uppercase">{{ themeColor }}</span>
@@ -229,14 +229,14 @@ onMounted(() => {
           <div class="relative" @click.stop>
             <div 
               @click="themeOpen = !themeOpen"
-              class="flex justify-between items-center p-3 bg-white/5 border border-white/10 rounded-xl cursor-pointer hover:border-primary/50 transition-colors"
+              class="flex justify-between items-center p-3 glass-control rounded-xl cursor-pointer"
             >
               <span class="text-sm">{{ t(`designer.opt.${cardTheme}`) }}</span>
               <i class="ri-arrow-down-s-line transition-transform" :class="{ 'rotate-180': themeOpen }"></i>
             </div>
             <div 
               v-show="themeOpen"
-              class="absolute top-full left-0 right-0 mt-2 bg-sidebar border border-white/10 rounded-xl shadow-2xl z-20 overflow-hidden"
+              class="absolute top-full left-0 right-0 mt-2 glass-panel rounded-xl shadow-2xl z-20 overflow-hidden"
             >
               <div 
                 v-for="themeOpt in ['dark', 'light']" 
@@ -368,5 +368,44 @@ onMounted(() => {
     </main>
   </div>
 </template>
+
+<style scoped>
+.glass-sidebar {
+  background: rgba(var(--bg-surface-rgb), 0.3);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border-bottom: 1px solid var(--glass-border);
+  transition: all 0.3s var(--ease-smooth);
+}
+
+@media (min-width: 1024px) {
+  .glass-sidebar {
+    border-bottom: none;
+    border-right: 1px solid var(--glass-border);
+    background: rgba(var(--bg-surface-rgb), 0.2);
+  }
+}
+
+.glass-control {
+  background: rgba(var(--bg-surface-rgb), 0.2);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  transition: all 0.3s var(--ease-smooth);
+}
+
+.glass-control:hover, .glass-control:focus {
+  border-color: rgba(var(--primary-rgb), 0.5);
+  background: rgba(var(--bg-surface-rgb), 0.4);
+  box-shadow: 0 0 15px rgba(var(--primary-rgb), 0.1);
+}
+
+/* Specific overrides for inputs to ensure text visibility and proper sizing */
+input.glass-control, textarea.glass-control {
+  color: var(--text-main);
+}
+
+/* Custom scrollbar for sidebar - Removed to use global style */
+</style>
 
 

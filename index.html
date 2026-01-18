@@ -43,6 +43,13 @@
   </head>
   <body>
     <div id="app"></div>
+    <script>
+      (function() {
+        // Initialize theme - Default to dark mode
+        const savedTheme = localStorage.getItem('theme') || 'dark';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+      })();
+    </script>
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>
